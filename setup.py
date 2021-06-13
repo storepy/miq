@@ -1,5 +1,10 @@
+from os import path
+from setuptools import setup, find_packages
 
-from setuptools import setup
+
+import miq
+
+here = path.abspath(path.dirname(__file__))
 
 setup(
     name='miq',
@@ -11,10 +16,11 @@ setup(
     author_email='michaelgainyo@gmail.com',
     keywords='',
     license='',
-    packages=['miq'],
+    packages=find_packages(),
     install_requires=[
-        'django', 'djangorestframework'
+        "django>=2.2", 'djangorestframework', 'Pillow'
     ],
+    python_requires=">=3.5",
     # test_suite='nose.collector',
     # tests_require=['nose'],
     # include_package_data=True

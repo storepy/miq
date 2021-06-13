@@ -1,8 +1,10 @@
 from django.db import models
 from django.contrib.sites.models import Site
 
+from django.utils.text import Truncator
 from django.contrib.auth import get_user_model
 from django.utils.translation import gettext_lazy as _
+from django.template.defaultfilters import filesizeformat
 
 from .mixins import BaseModelMixin
 
@@ -60,9 +62,33 @@ class Image(BaseModelMixin):
     objects = ImageManager()
 
     class Meta:
-        ordering = ('-updated', '-created',)
+        ordering = ('-updated', '-created', 'position')
         verbose_name = _('Image')
         verbose_name_plural = _('Images')
 
     def __str__(self):
+        return f'{self.src}'
+
+    @property
+    def name_truncated(self):
+        return Truncator(self.name).chars(30)
+
+    @property
+    def name(self):
         return f'{self.src.name}'
+
+    @property
+    def width(self):
+        return self.src.width
+
+    @property
+    def height(self):
+        return self.src.height
+
+    @property
+    def size(self):
+        return filesizeformat(self.src.size)
+
+    def deactivate(self):
+        self.is_active = False
+        self.save()
