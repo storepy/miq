@@ -2,7 +2,7 @@ import tempfile
 from PIL import Image
 
 
-def get_temp_img(size=50, close=False):
+def get_temp_img(size=50):
     img = Image.new('RGB', (size, size))
     tmp = tempfile.NamedTemporaryFile(suffix='.jpg')
     img.save(tmp, 'jpeg')

@@ -13,7 +13,7 @@ setup(
     license='',
     packages=['miq'],
     install_requires=[
-        'django',
+        'django', 'djangorestframework'
     ],
     # test_suite='nose.collector',
     # tests_require=['nose'],
