@@ -6,12 +6,14 @@ from rest_framework import routers
 
 from .views import PageView, IndexView
 from .api_auth.viewsets import (
-    ImageViewset, SectionViewset, PageViewset, IndexViewset, FileViewset
+    ImageViewset, SectionViewset, PageViewset, IndexViewset, FileViewset, StaffSearchView
 )
 
 app_name = 'miq'
 
 auth_router = routers.DefaultRouter()
+auth_router.register(r'search-staff', StaffSearchView)
+
 auth_router.register(r'pages', PageViewset)
 auth_router.register(r'sections', SectionViewset)
 auth_router.register(r'index', IndexViewset)

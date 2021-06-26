@@ -1,3 +1,4 @@
+from django.contrib.auth import get_user_model
 from django.contrib.sites.shortcuts import get_current_site
 
 from rest_framework import status, viewsets, mixins
@@ -19,8 +20,14 @@ from .serializers import (
 
     # sections
     SectionSerializer, TextSectionSerializer, MarkdownSectionSerializer,
-    PageSerializer, IndexSerializer
+    PageSerializer, IndexSerializer,
+
+    # user
+    UserListSerializer
 )
+
+User = get_user_model()
+
 
 """
 IMAGE
@@ -163,3 +170,21 @@ class FileViewset(DevLoginRequiredMixin, viewsets.ModelViewSet):
 
     def perform_create(self, ser):
         ser.save(site=get_current_site(self.request), user=self.request.user)
+
+
+"""
+# USER
+"""
+
+class StaffSearchView(DevLoginRequiredMixin,mixins.ListModelMixin, viewsets.GenericViewSet):
+    queryset = User.objects.none()
+    serializer_class = UserListSerializer
+    # permission_classes=[]
+
+    def get_queryset(self, *args, **kwargs):
+        params = self.request.query_params
+        q = params.get('q')
+        if q and len(q) > 2:
+            return User.objects.staff().exclude(pk=self.request.user.pk).search(q)
+
+        return self.queryset
