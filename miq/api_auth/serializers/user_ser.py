@@ -16,3 +16,12 @@ class UserListSerializer(serializers.ModelSerializer):
 
     def get_name(self, obj):
         return obj.get_full_name()
+
+
+class StaffUserSerializer(UserListSerializer):
+    class Meta:
+        model = User
+        fields = (
+            'slug', 'username', 'first_name', 'last_name', 'name',
+            'email', 'is_staff'
+        )
