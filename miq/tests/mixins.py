@@ -1,5 +1,7 @@
 from django.contrib.sites.models import Site
 from django.contrib.auth import get_user_model
+from django.contrib.auth.models import Permission
+from django.contrib.contenttypes.models import ContentType
 
 User = get_user_model()
 
@@ -23,8 +25,31 @@ class UserMixin:
 
         return self.create_user(username, password)
 
+    def add_user_perm(self, model, perm_code, user):
+        perm = self.get_user_perm(model, perm_code)
+        user.user_permissions.add(perm)
+
+    def get_user_perm(self, model, perm_code):
+        content_type = ContentType.objects.get_for_model(model)
+        return Permission.objects.get(
+            codename=perm_code,
+            content_type=content_type)
+
     def create_user(self, username, password):
         user = User.objects.create_user(username=username)
+        user.set_password(password)
+        user.save()
+        return user
+
+    def create_staffuser(self, username, password):
+        user = User.objects.create_user(username=username)
+        user.set_password(password)
+        user.is_staff = True
+        user.save()
+        return user
+
+    def create_superuser(self, username, password):
+        user = User.objects.create_superuser(username=username)
         user.set_password(password)
         user.save()
         return user

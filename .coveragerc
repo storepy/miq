@@ -1,0 +1,3 @@
+[run]
+source = .
+omit = */env/*, */grioenv/*, */tests/*, */migrations/*, */urls.py, */settings/*, */wsgi.py, */asgi.py, manage.py, fabfile.py
