@@ -10,6 +10,8 @@ from .models import (
 
 CustomUser = get_user_model()
 
+
+@admin.register(CustomUser)
 class CustomUserAdmin(UserAdmin):
     model = CustomUser
     # add_form = SignupForm
@@ -21,12 +23,17 @@ class CustomUserAdmin(UserAdmin):
     search_fields = ['username', 'email', 'slug']
 
 
-
-admin.site.register(CustomUser, CustomUserAdmin)
+# admin.site.register(CustomUser, CustomUserAdmin)
 
 admin.site.register(Image)
 admin.site.register(Section)
 
 admin.site.register(Index)
-admin.site.register(Page)
+
+
+@admin.register(Page)
+class PageAdmin(admin.ModelAdmin):
+    list_display = ('label', 'slug_public', 'slug')
+
+
 admin.site.register(PageSectionMeta)

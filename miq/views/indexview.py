@@ -2,8 +2,7 @@
 from django.shortcuts import get_object_or_404
 from django.contrib.sites.shortcuts import get_current_site
 
-from miq.models import Index
-from miq.models.section import Section
+from miq.models import Index, Section
 
 from .generic import ListView
 
