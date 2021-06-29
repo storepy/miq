@@ -36,6 +36,10 @@ class FileManager(models.Manager):
 
 
 class File(BaseModelMixin):
+    # For filtering
+    source_app = models.CharField(
+        _("Source application"), max_length=150, 
+        db_index=True, null=True, blank=True, editable=False)
 
     site = models.ForeignKey(
         Site, on_delete=models.CASCADE,
@@ -61,6 +65,10 @@ class File(BaseModelMixin):
 
     def __str__(self):
         return f'{self.src}'
+
+    def save(self, *args, **kwargs):
+        self.source_app = self._meta.app_label
+        return super().save(*args, **kwargs)
 
     @property
     def name_truncated(self):

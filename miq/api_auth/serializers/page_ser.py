@@ -1,9 +1,6 @@
 from rest_framework import serializers
 
-from miq.models import (
-    Page, Section
-)
-
+from miq.models import (Page)
 __all__ = (
     'PageSerializer',
 )
@@ -13,7 +10,7 @@ class PageSerializer(serializers.ModelSerializer):
     class Meta:
         model = Page
         fields = (
-            'slug', 'children', 'sections', 'label',  'is_published', 'dt_published',
+            'slug_public', 'slug', 'children', 'sections', 'label', 'is_published', 'dt_published',
             'updated_since',
             # 'sections_data',
         )

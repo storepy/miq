@@ -7,7 +7,8 @@ from django.utils.timesince import timesince
 from django.contrib.sites.models import Site
 from django.utils.translation import gettext_lazy as _
 
-from miq.models.mixins import BaseModelMixin
+
+from .mixins import BaseModelMixin
 
 
 __all__ = ['Index', 'Page', 'PageSectionMeta']
@@ -93,13 +94,17 @@ class Page(AbstractPage):
 
     def save(self, *args, **kwargs):
 
-        if not self.slug_pk:
-            self.slug_pk = uuid4()
+        # if not self.slug_pk:
+        #     self.slug_pk = uuid4()
 
         if self.is_published and not self.dt_published:
             self.dt_published = timezone.now()
 
         super().save(*args, **kwargs)
+
+        sections = self.sections.exclude(source=self.slug)
+        if sections.exists():
+            sections.update(source=self.slug)
 
     # From Abstract:  title
     # From related: children
@@ -123,15 +128,11 @@ class Page(AbstractPage):
     source = models.CharField(max_length=100, blank=True, null=True)
 
     label = models.CharField(max_length=100, help_text=_('Page header label'))
-    slug = models.SlugField(
-        max_length=200, db_index=True, unique=True,
-        default=uuid4
-    )
 
-    # For internal and system use
-    slug_pk = models.SlugField(
+    # For public and system use
+    slug_public = models.SlugField(
         max_length=100, unique=True, db_index=True,
-        editable=False, null=True,
+        default=uuid4
     )
 
     is_published = models.BooleanField(
@@ -194,3 +195,13 @@ class PageSectionMeta(BaseModelMixin):
 
     def __str__(self):
         return f'{self.page}, section[{self.section}] {self.section.position}'
+
+
+# class PageSection(Section):
+#     class Meta(Section.Meta):
+#         proxy=True
+
+#     def save(self, *args, **kwargs):
+#         if self.pk:
+
+#         super().save(*args, **kwargs)
