@@ -33,7 +33,9 @@ class AbstractPage(BaseModelMixin):
 
 class IndexManager(models.Manager):
     def get_queryset(self, *args, **kwargs):
-        return super().get_queryset(*args, **kwargs).prefetch_related('sections').select_related('site')
+        return super().get_queryset(*args, **kwargs)\
+            .prefetch_related('sections')\
+            .select_related('site')
 
 
 class Index(AbstractPage):
@@ -189,7 +191,8 @@ class PageSectionMeta(BaseModelMixin):
     def save(self, *args, **kwargs):
         super().save(*args, **kwargs)
 
-        if self.section and self.page and self.section.source != self.page.slug:
+        if self.section and self.page\
+                and self.section.source != self.page.slug:
             self.section.source = self.page.slug
             self.section.save()
 

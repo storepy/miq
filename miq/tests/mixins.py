@@ -25,15 +25,12 @@ class UserMixin:
 
         return self.create_user(username, password)
 
-    def add_user_perm(self, model, perm_code, user):
-        perm = self.get_user_perm(model, perm_code)
+    def add_user_perm(self,  user, codename):
+        perm = self.get_user_perm(codename)
         user.user_permissions.add(perm)
 
-    def get_user_perm(self, model, perm_code):
-        content_type = ContentType.objects.get_for_model(model)
-        return Permission.objects.get(
-            codename=perm_code,
-            content_type=content_type)
+    def get_user_perm(self, codename):
+        return Permission.objects.get(codename=codename)
 
     def create_user(self, username, password):
         user = User.objects.create_user(username=username)
@@ -53,6 +50,9 @@ class UserMixin:
         user.set_password(password)
         user.save()
         return user
+
+    def refresh_user(self, username):
+        self.user = User.objects.get(username=username)
 
 
 class SiteMixin:

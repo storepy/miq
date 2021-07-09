@@ -5,8 +5,9 @@ from django.conf import settings
 from rest_framework import routers
 
 from .views import PageView, IndexView
-from .api_auth.viewsets import (
-    ImageViewset, SectionViewset, PageViewset, IndexViewset, FileViewset, StaffSearchView
+from .staff.api.viewsets import (
+    ImageViewset, SectionViewset, PageViewset,
+    IndexViewset, FileViewset, StaffSearchView
 )
 
 app_name = 'miq'
