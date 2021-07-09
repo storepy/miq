@@ -3,9 +3,10 @@ from django.contrib.sites.shortcuts import get_current_site
 
 from rest_framework import status, viewsets, mixins
 from rest_framework.decorators import action
-from rest_framework.parsers import JSONParser, MultiPartParser
 from rest_framework.response import Response
+from rest_framework.permissions import IsAdminUser
 from rest_framework.serializers import ValidationError
+from rest_framework.parsers import JSONParser, MultiPartParser
 
 from miq.models import Section, Page, Index, Image, File
 
@@ -92,9 +93,6 @@ class SectionViewset(DevLoginRequiredMixin, viewsets.ModelViewSet):
         # TODO: Enforce
         serializer.save(site=get_current_site(self.request))
 
-    def create(self, request, *args, **kwargs):
-        return super().create(request, *args, **kwargs)
-
 
 """
 PAGE
@@ -124,6 +122,7 @@ class PageViewset(PagesActionMixin, viewsets.ModelViewSet):
     serializer_class = PageSerializer
     queryset = Page.objects.all()
     parser_classes = (JSONParser, )
+    permission_classes = (IsAdminUser,)
 
     def perform_create(self, serializer):
         # TODO: Enforce
@@ -151,6 +150,7 @@ class IndexViewset(
     serializer_class = IndexSerializer
     queryset = Index.objects.none()
     parser_classes = (JSONParser, )
+    permission_classes = (IsAdminUser,)
 
     def get_object(self):
         site = get_current_site(self.request)
@@ -176,15 +176,19 @@ class FileViewset(DevLoginRequiredMixin, viewsets.ModelViewSet):
 # USER
 """
 
-class StaffSearchView(DevLoginRequiredMixin,mixins.ListModelMixin, viewsets.GenericViewSet):
+
+class StaffSearchView(
+        DevLoginRequiredMixin, mixins.ListModelMixin, viewsets.GenericViewSet):
     queryset = User.objects.none()
     serializer_class = UserListSerializer
-    # permission_classes=[]
+    permission_classes = (IsAdminUser,)
 
     def get_queryset(self, *args, **kwargs):
         params = self.request.query_params
         q = params.get('q')
         if q and len(q) > 2:
-            return User.objects.staff().exclude(pk=self.request.user.pk).search(q)
+            return User.objects.staff()\
+                .exclude(pk=self.request.user.pk)\
+                .search(q)
 
         return self.queryset

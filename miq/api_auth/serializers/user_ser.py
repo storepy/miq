@@ -8,10 +8,11 @@ class UserListSerializer(serializers.ModelSerializer):
     class Meta:
         model = User
         fields = (
-            'slug', 'username', 'first_name', 'last_name', 'name'
+            'slug', 'username', 'first_name', 'last_name', 'name', 'initials'
         )
         read_only_fields = fields
 
+    initials = serializers.ReadOnlyField()
     name = serializers.SerializerMethodField()
 
     def get_name(self, obj):
@@ -22,6 +23,7 @@ class StaffUserSerializer(UserListSerializer):
     class Meta:
         model = User
         fields = (
-            'slug', 'username', 'first_name', 'last_name', 'name',
+            'slug', 'username',
+            'first_name', 'last_name', 'name', 'initials',
             'email', 'is_staff'
         )

@@ -7,6 +7,7 @@ from django.contrib.auth.models import UserManager as DjUserManager
 
 from .mixins import BaseModelMixin
 
+
 class UserQuerySet(models.QuerySet):
     def search(self, q: str, **kwargs):
         # https://stackoverflow.com/questions/4824759/django-query-using-contains-each-value-in-a-list
@@ -24,13 +25,13 @@ class UserQuerySet(models.QuerySet):
     def staff(self):
         return self.filter(is_staff=True)
 
+
 class UserManager(DjUserManager):
     def staff(self):
         return self.get_queryset().staff()
 
     def get_queryset(self):
         return UserQuerySet(self.model, using=self._db)
-
 
 
 class User(BaseModelMixin, AbstractUser):
@@ -50,12 +51,15 @@ class User(BaseModelMixin, AbstractUser):
             message=_('This username is too short. (4 characters minimum)'))],
         error_messages={
             'unique': _("This username is taken."),
-            'min_length': _('This username is too short. (4 characters minimum)'),
+            'min_length': _(
+                'This username is too short. (4 characters minimum)'),
         },
     )
     first_name = models.CharField(
         _('First name'), max_length=100,
-        validators=[MinLengthValidator(2, message=_('Enter your first name.'))])
+        validators=[
+            MinLengthValidator(2, message=_('Enter your first name.'))
+        ])
     last_name = models.CharField(
         _('Last name'), max_length=100,
         validators=[MinLengthValidator(2, message=_('Enter your last name.'))])
@@ -76,3 +80,13 @@ class User(BaseModelMixin, AbstractUser):
 
     def __str__(self):
         return f'{self.username}'
+
+    @property
+    def initials(self):
+        i = ''
+        if self.first_name:
+            i += self.first_name[0]
+        if self.last_name:
+            i += self.last_name[0]
+
+        return i.upper()
