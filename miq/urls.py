@@ -5,6 +5,7 @@ from django.conf import settings
 from rest_framework import routers
 
 from .views import PageView, IndexView
+from .auth.api.views import AccountUpdateViewset
 from .auth.api.viewsets import (
     ImageViewset, SectionViewset, FileViewset
 )
@@ -17,6 +18,7 @@ app_name = 'miq'
 auth_router = routers.DefaultRouter()
 auth_router.register(r'search-staff', StaffSearchView)
 
+auth_router.register(r'account', AccountUpdateViewset)
 auth_router.register(r'pages', PageViewset)
 auth_router.register(r'sections', SectionViewset)
 auth_router.register(r'index', IndexViewset)

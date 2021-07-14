@@ -1,5 +1,6 @@
 # import environ
 
+
 CORS_ORIGIN = None
 DEBUG = False
 

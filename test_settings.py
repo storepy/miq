@@ -1,9 +1,10 @@
 from pathlib import Path
+from django.urls import reverse_lazy
 from miq.config import (
     AUTH_USER_MODEL,
 )
 
-# AUTH_USER_MODEL = 'miq.User'
+
 # TEMPLATES_DIR = 'templates'
 # TEMPLATES_DIR = BASE_DIR / 'templates'
 BASE_DIR = Path(__file__).resolve().parent
@@ -80,6 +81,13 @@ TEMPLATES = [
         },
     },
 ]
+
+#
+
+LOGIN_REDIRECT_URL = reverse_lazy('accounts:login')
+
+#
+
 
 REST_FRAMEWORK = {
     'DEFAULT_AUTHENTICATION_CLASSES': [

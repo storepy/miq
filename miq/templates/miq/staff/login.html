@@ -1,0 +1,70 @@
+<!-- prettier-ignore -->
+
+{% extends 'miq/staff/base.html' %}
+{% load i18n %}
+
+{% block body %}
+
+<div class="staff-signin-container">
+    <div class="col-md-4 col-sm-6">
+        {% block form %}
+
+        <form class="form form-signin" method="post" action="{% url 'staff:login' %}">
+            {% csrf_token %}
+
+            <div class="d-flex align-items-top justify-content-between px-4">
+                <div class="">
+                    <span class="lead">{% trans "Sign in" %}</span>
+                    {% if next %}
+                    <div class="small">{% trans "to see this page" %}</div>
+                    {% endif %}
+                </div>
+            </div>
+
+            <div class="card-body mt-3">
+                <label for="username" class="sr-only form-label">{% trans "Username" %}</label>
+                <input
+                    required
+                    autofocus
+                    type="text"
+                    name="username"
+                    id="username"
+                    autocomplete="username"
+                    class="form-control {% if form.username.errors %}is-invalid{% endif %} mb-4"
+                    placeholder='{% trans "Username" %}'
+                />
+
+                {% comment %}
+                <div className="invalid-feedback">{error}</div>
+                {% endcomment %}
+
+                <label for="password" class="sr-only form-label">{% trans "Password" %}</label>
+                <input
+                    required
+                    type="password"
+                    name="password"
+                    id="password"
+                    class="form-control mb-4"
+                    placeholder="Password"
+                    autocomplete="current-password"
+                />
+
+                <button type="submit" class="btn btn-primary btn-block">{% trans "Sign in" %}</button>
+
+                <input type="hidden" name="next" value="{{ next }}" />
+            </div>
+        </form>
+
+        <div class="card-body text-center">
+            <a href="">{% trans "Forgot your password?" %}</a>
+        </div>
+
+        {% endblock form %}
+    </div>
+</div>
+
+{% endblock body %}
+
+<!-- prettier-ignore -->
+
+{% comment %} {% url 'accounts:password_reset' %} {% endcomment %}
