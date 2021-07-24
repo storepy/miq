@@ -4,7 +4,7 @@ from django.urls import reverse_lazy
 
 from .page_ser import *
 from .index_ser import *
-from .user_ser import UserListSerializer, StaffUserSerializer
+from .user_ser import StaffUserSerializer
 
 
 """

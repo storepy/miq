@@ -11,6 +11,9 @@ class CORSMiddleware(object):
 
         self.process_response(request, response)
 
+        # from pprint import pprint
+        # pprint(request.headers.__dict__)
+
         return response
 
     def process_response(self, request, response):

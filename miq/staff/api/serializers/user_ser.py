@@ -1,29 +1,21 @@
+
+
 from django.contrib.auth import get_user_model
 from rest_framework import serializers
+
+from miq.auth.api.serializers import AccountSerializer
 
 User = get_user_model()
 
 
-class UserListSerializer(serializers.ModelSerializer):
-    class Meta:
-        model = User
+class StaffUserSerializer(AccountSerializer):
+    class Meta(AccountSerializer.Meta):
         fields = (
-            'slug', 'username', 'first_name', 'last_name', 'name', 'initials'
+            'is_staff',
+            'username', 'slug', 'email',
+            'first_name', 'last_name', 'name',
+            'initials', 'gender', 'gender_label',
+            'img', 'img_data',
         )
-        read_only_fields = fields
 
-    initials = serializers.ReadOnlyField()
-    name = serializers.SerializerMethodField()
-
-    def get_name(self, obj):
-        return obj.get_full_name()
-
-
-class StaffUserSerializer(UserListSerializer):
-    class Meta:
-        model = User
-        fields = (
-            'slug', 'username',
-            'first_name', 'last_name', 'name', 'initials',
-            'email', 'is_staff'
-        )
+    gender_label = serializers.ReadOnlyField()

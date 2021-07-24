@@ -4,7 +4,7 @@ from django.conf import settings
 
 from rest_framework import routers
 
-from .views import PageView, IndexView
+from .views import PageView
 from .auth.api.views import AccountUpdateViewset
 from .auth.api.viewsets import (
     ImageViewset, SectionViewset, FileViewset
@@ -30,6 +30,4 @@ urlpatterns = [
 
     # API
     path(f'{settings.API_PATH}/', include(auth_router.urls)),
-
-    path('', IndexView.as_view(), name='index'),
 ]

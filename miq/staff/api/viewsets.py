@@ -12,8 +12,9 @@ from miq.models import Page, Index
 
 from miq.mixins import DevLoginRequiredMixin
 from miq.permissions import DjangoModelPermissions
+from miq.auth.api.serializers import UserListSerializer
 
-from .serializers import PageSerializer, IndexSerializer, UserListSerializer
+from .serializers import PageSerializer, IndexSerializer
 
 User = get_user_model()
 

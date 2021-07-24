@@ -4,7 +4,6 @@ from rest_framework import serializers
 
 from miq.models import File, Image
 from miq.models import Section, ImageSection, MarkdownSection, TextSection
-from miq.staff.api.serializers.user_ser import UserListSerializer
 
 User = get_user_model()
 
@@ -40,13 +39,29 @@ class ImageSerializer(serializers.ModelSerializer):
 """
 
 
-class AccountSerializer(serializers.ModelSerializer):
-    # Use in /accounts/account/
-
+class UserListSerializer(serializers.ModelSerializer):
     class Meta:
         model = User
         fields = (
-            'username', 'slug', 'first_name', 'last_name', 'email',
+            'slug', 'username', 'initials',
+            'first_name', 'last_name', 'name',
+        )
+        read_only_fields = fields
+
+    initials = serializers.ReadOnlyField()
+    name = serializers.SerializerMethodField()
+
+    def get_name(self, obj):
+        return obj.get_full_name()
+
+
+class AccountSerializer(UserListSerializer):
+    # Use in /accounts/account/
+
+    class Meta(UserListSerializer.Meta):
+        fields = (
+            'username', 'slug', 'email',
+            'first_name', 'last_name', 'name', 'initials',
             'img', 'img_data',
             # 'birthdate', 'phone',
             # 'img', 'is_email_verified'

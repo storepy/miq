@@ -17,15 +17,16 @@ LOGIN VIEW
 
 
 class Mixin(object):
+    pass
 
-    @method_decorator(sensitive_post_parameters())
-    @method_decorator(csrf_protect)
-    @method_decorator(never_cache)
-    def dispatch(self, request, *args, **kwargs):
-        if request.user.is_authenticated:
-            return redirect(settings.LOGIN_REDIRECT_URL)
+    # @method_decorator(sensitive_post_parameters())
+    # @method_decorator(csrf_protect)
+    # @method_decorator(never_cache)
+    # def dispatch(self, request, *args, **kwargs):
+    #     if request.user.is_authenticated:
+    #         return redirect(settings.LOGIN_REDIRECT_URL)
 
-        return super().dispatch(request, *args, **kwargs)
+    #     return super().dispatch(request, *args, **kwargs)
 
 
 class LoginView(Mixin, auth_views.LoginView):
@@ -36,4 +37,5 @@ class LoginView(Mixin, auth_views.LoginView):
     """
 
     authentication_form = AuthenticationForm
-    # template_name = 'miq/accounts/login.html'
+    template_name = 'miq/accounts/login.html'
+    redirect_authenticated_user = True

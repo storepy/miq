@@ -34,6 +34,12 @@ class UserManager(DjUserManager):
         return UserQuerySet(self.model, using=self._db)
 
 
+class UserGender(models.TextChoices):
+    MALE = 'MALE', _('Male')
+    FEMALE = 'FEMALE', _('Female')
+    OTHER = 'OTHER', _('Other')
+
+
 class User(BaseModelMixin, AbstractUser):
 
     REQUIRED_FIELDS = ['email', 'first_name']  # Terminal only
@@ -63,6 +69,9 @@ class User(BaseModelMixin, AbstractUser):
     last_name = models.CharField(
         _('Last name'), max_length=100,
         validators=[MinLengthValidator(2, message=_('Enter your last name.'))])
+    gender = models.CharField(
+        _("Gender"), choices=UserGender.choices,
+        default=UserGender.OTHER, max_length=50)
 
     img = models.OneToOneField(
         'miq.Image',
@@ -80,6 +89,10 @@ class User(BaseModelMixin, AbstractUser):
 
     def __str__(self):
         return f'{self.username}'
+
+    @property
+    def gender_label(self):
+        return UserGender[self.gender].label
 
     @property
     def initials(self):

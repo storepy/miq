@@ -3,16 +3,29 @@
 {% extends 'miq/staff/base.html' %}
 {% load i18n %}
 
+<style>
+    {% block css %}
+
+        .miq-container{
+            margin-top: 64px;
+            margin-bottom: 64px;
+            padding: var(--sp-1);
+            max-width: 350px;
+        }
+
+    {% endblock css %}
+</style>
+
 {% block body %}
 
-<div class="staff-signin-container">
+<div class="staff-signin-container miq-container">
     <div class="col-md-4 col-sm-6">
         {% block form %}
 
         <form class="form form-signin" method="post" action="{% url 'staff:login' %}">
             {% csrf_token %}
 
-            <div class="d-flex align-items-top justify-content-between px-4">
+            <div class="d-flex align-items-top justify-content-between mb-3">
                 <div class="">
                     <span class="lead">{% trans "Sign in" %}</span>
                     {% if next %}
@@ -21,8 +34,8 @@
                 </div>
             </div>
 
-            <div class="card-body mt-3">
-                <label for="username" class="sr-only form-label">{% trans "Username" %}</label>
+            <div class="card-body">
+                <label for="username" class="d-block sr-only form-label mb-1">{% trans "Username" %}</label>
                 <input
                     required
                     autofocus
@@ -30,7 +43,7 @@
                     name="username"
                     id="username"
                     autocomplete="username"
-                    class="form-control {% if form.username.errors %}is-invalid{% endif %} mb-4"
+                    class="miq-input {% if form.username.errors %}is-invalid{% endif %} mb-2"
                     placeholder='{% trans "Username" %}'
                 />
 
@@ -38,13 +51,13 @@
                 <div className="invalid-feedback">{error}</div>
                 {% endcomment %}
 
-                <label for="password" class="sr-only form-label">{% trans "Password" %}</label>
+                <label for="password" class="d-block sr-only form-label mb-1">{% trans "Password" %}</label>
                 <input
                     required
                     type="password"
                     name="password"
                     id="password"
-                    class="form-control mb-4"
+                    class="miq-input mb-4"
                     placeholder="Password"
                     autocomplete="current-password"
                 />
@@ -55,7 +68,7 @@
             </div>
         </form>
 
-        <div class="card-body text-center">
+        <div class="my-4 text-center">
             <a href="">{% trans "Forgot your password?" %}</a>
         </div>
 
