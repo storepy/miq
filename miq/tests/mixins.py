@@ -28,6 +28,7 @@ class UserMixin:
     def add_user_perm(self,  user, codename):
         perm = self.get_user_perm(codename)
         user.user_permissions.add(perm)
+        return user
 
     def get_user_perm(self, codename):
         return Permission.objects.get(codename=codename)
