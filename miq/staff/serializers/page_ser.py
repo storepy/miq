@@ -1,23 +1,21 @@
 from rest_framework import serializers
 
-from miq.models import (Page)
-__all__ = (
-    'PageSerializer',
-)
+from miq.models import Page
 
 
 class PageSerializer(serializers.ModelSerializer):
     class Meta:
         model = Page
+        read_only_fields = ('dt_published', 'sections', 'children')
         fields = (
-            'slug_public', 'slug', 'children', 'sections', 'label', 'is_published', 'dt_published',
+            *read_only_fields,
+            'slug_public', 'slug',
+            'label', 'is_published',
             'updated_since',
             # 'sections_data',
         )
-        read_only_fields = ('dt_published', 'sections', 'children')
 
     updated_since = serializers.ReadOnlyField()
-
     children = serializers.SlugRelatedField(
         slug_field="slug", read_only=True, many=True
     )

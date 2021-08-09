@@ -9,7 +9,7 @@ from .auth import (
     AccountUpdateViewset,
     ImageViewset, SectionViewset, FileViewset
 )
-from .staff.api.viewsets import (
+from .staff import (
     PageViewset, IndexViewset, StaffSearchView
 )
 

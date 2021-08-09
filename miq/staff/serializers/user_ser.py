@@ -3,7 +3,7 @@
 from django.contrib.auth import get_user_model
 from rest_framework import serializers
 
-from miq.auth.api.serializers import AccountSerializer
+from miq.auth import AccountSerializer
 
 User = get_user_model()
 

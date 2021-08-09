@@ -9,7 +9,8 @@ from miq.mixins import StaffLoginRequired
 from miq.utils import get_user_perms_dict, get_serialized_app_configs_dict
 
 from .forms import StaffAuthForm
-from .api.serializers import AdminSiteSerializer, StaffUserSerializer
+from .serializers import AdminSiteSerializer
+from .serializers.user_ser import StaffUserSerializer
 
 
 """

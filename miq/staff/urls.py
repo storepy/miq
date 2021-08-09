@@ -1,7 +1,7 @@
 
 from django.urls import path, re_path
 
-from miq.staff.views import StaffLoginView, AdminView
+from .views import StaffLoginView, AdminView
 
 
 app_name = 'staff'
