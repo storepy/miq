@@ -38,7 +38,7 @@ class FileManager(models.Manager):
 class File(BaseModelMixin):
     # For filtering
     source_app = models.CharField(
-        _("Source application"), max_length=150, 
+        _("Source application"), max_length=150,
         db_index=True, null=True, blank=True, editable=False)
 
     site = models.ForeignKey(
@@ -52,6 +52,7 @@ class File(BaseModelMixin):
     )
 
     src = models.FileField(
+        max_length=500,
         verbose_name=_("File"),
         help_text=_("Select a file"),
         upload_to=upload_to)
