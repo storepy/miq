@@ -10,7 +10,7 @@ from miq.models import Image
 
 from miq.mixins import DevLoginRequiredMixin
 
-from .serializers import (
+from ..serializers import (
     # images
     AccountSerializer, ImageSerializer, ImageSectionSerializer,
 

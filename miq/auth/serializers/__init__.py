@@ -17,7 +17,7 @@ class ImageSerializer(serializers.ModelSerializer):
     class Meta:
         model = Image
         fields = (
-            'slug', 'src',
+            'slug', 'src', 'thumb', 'thumb_sq',
             'alt_text', 'caption', 'position',
             'name', 'name_truncated', 'height', 'width', 'size',
             'created', 'updated',

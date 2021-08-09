@@ -5,8 +5,8 @@ from django.conf import settings
 from rest_framework import routers
 
 from .views import PageView
-from .auth.api.views import AccountUpdateViewset
-from .auth.api.viewsets import (
+from .auth import (
+    AccountUpdateViewset,
     ImageViewset, SectionViewset, FileViewset
 )
 from .staff.api.viewsets import (

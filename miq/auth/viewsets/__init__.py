@@ -9,7 +9,7 @@ from miq.models import Section, Image, File
 
 from miq.mixins import DevLoginRequiredMixin
 
-from .serializers import (
+from ..serializers import (
     # images
     ImageSerializer, ImageSectionSerializer,
 
