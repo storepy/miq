@@ -1,10 +1,9 @@
 from django.test import TestCase
 from django.urls import reverse_lazy
 
-from miq.models import Page
 from miq.tests.mixins import TestMixin
 
-path = reverse_lazy('miq:index')
+path = reverse_lazy('index')
 
 
 class Mixin(TestMixin):

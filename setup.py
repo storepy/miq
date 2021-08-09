@@ -2,7 +2,7 @@ from os import path
 from setuptools import setup, find_packages
 
 
-import miq
+# import miq
 
 here = path.abspath(path.dirname(__file__))
 
@@ -18,8 +18,14 @@ setup(
     license='',
     packages=find_packages(),
     install_requires=[
-        "django>=2.2", 'djangorestframework', 'Pillow'
+        "django>=2.2", 'djangorestframework', 'Pillow', 'django-environ',
     ],
+    extras_require={
+        "dev": [
+            'coverage', 'selenium',
+            'pytest', 'pytest-cov', 'pytest-django',
+        ]
+    },
     python_requires=">=3.5",
     # test_suite='nose.collector',
     # tests_require=['nose'],

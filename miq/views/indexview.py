@@ -20,7 +20,9 @@ class IndexView(ListView):
 
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
-        context['object'] = self.object
-        context['title'] = self.object.title
+
+        if (obj := self.object) is not None:
+            context['object'] = obj
+            context['title'] = obj.title
 
         return context

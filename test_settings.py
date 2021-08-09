@@ -7,7 +7,7 @@ from miq.config import (
 
 # TEMPLATES_DIR = 'templates'
 # TEMPLATES_DIR = BASE_DIR / 'templates'
-BASE_DIR = Path(__file__).resolve().parent
+BASE_DIR = Path(__file__).resolve()
 
 SITE_ID = 1
 API_PATH = 'api/v1'
@@ -101,3 +101,11 @@ REST_FRAMEWORK = {
     'DEFAULT_PAGINATION_CLASS': 'rest_framework.pagination.PageNumberPagination',
     'PAGE_SIZE': 16,
 }
+
+# MEDIA & STATIC
+
+STATIC_URL = '/static/'
+STATIC_ROOT = BASE_DIR / 'static'
+
+MEDIA_URL = '/media/'
+MEDIA_ROOT = BASE_DIR / 'media'
