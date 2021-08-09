@@ -6,6 +6,7 @@ from miq.auth.accounts.forms import AuthenticationForm
 
 class StaffAuthForm(AuthenticationForm):
     def confirm_login_allowed(self, user):
+        super().confirm_login_allowed(user)
+
         if not user.is_staff:
             raise ValidationError(_('This account invalid'), code='invalid')
-        return super().confirm_login_allowed(user)

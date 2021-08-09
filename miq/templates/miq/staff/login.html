@@ -6,20 +6,29 @@
 <style>
     {% block css %}
 
-        .miq-container{
-            margin-top: 64px;
-            margin-bottom: 64px;
-            padding: var(--sp-1);
-            max-width: 350px;
-        }
+    .staff-signin-container{
+        position: fixed;
+        top: 0;
+        left: 0;
+        width: 100vw;
+        height: 100vh;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+    }
 
+    .staff-signin-container .content{
+        max-width: 350px;
+        padding: var(--sp-1);
+
+    }
     {% endblock css %}
 </style>
 
 {% block body %}
 
-<div class="staff-signin-container miq-container">
-    <div class="col-md-4 col-sm-6">
+<div class="staff-signin-container ">
+    <div class="content flex-1">
         {% block form %}
 
         <form class="form form-signin" method="post" action="{% url 'staff:login' %}">
@@ -67,11 +76,6 @@
                 <input type="hidden" name="next" value="{{ next }}" />
             </div>
         </form>
-
-        <div class="my-4 text-center">
-            <a href="">{% trans "Forgot your password?" %}</a>
-        </div>
-
         {% endblock form %}
     </div>
 </div>
