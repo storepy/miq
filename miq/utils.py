@@ -1,4 +1,5 @@
 from django.apps import apps
+from django.contrib.auth import get_user_model
 
 
 def serialize_app_config(app_config):
@@ -25,6 +26,21 @@ def get_serialized_app_configs_dict(exclude=None, exclude_django_apps=False):
         f"{app['label']}": app for app in installed_apps
         if f"{app['label']}" not in exclude
     }
+
+
+def create_staffuser(username, password, **kwargs):
+    """
+    Creates a new user and sets is_staff to True
+    """
+
+    User = get_user_model()
+
+    user = User.objects.create_user(username=username, **kwargs, is_staff=True)
+    user.set_password(password)
+    # user.is_staff = True
+    # user.save()
+    assert user.is_staff == True
+    return user
 
 
 def get_user_perms_list(user):

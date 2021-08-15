@@ -1,3 +1,4 @@
+from django.apps import apps
 from django.contrib.auth import get_user_model
 from django.contrib.sites.shortcuts import get_current_site
 
@@ -32,32 +33,20 @@ class AccountUpdateViewset(
     queryset = User.objects.none()
     parser_classes = (JSONParser, )
 
-    # @action(methods=['patch'], detail=True)
-    # def profile(self, request, *args, **kwargs):
-    #     serializer = ProfileSerializer(
-    #         self.get_object().profile,
-    #         data=request.data,
-    #         partial=kwargs.pop('partial', False)
-    #     )
-    #     serializer.is_valid(raise_exception=True)
-    #     serializer.save()
+    @action(methods=['patch'], detail=True, url_path=r'position')
+    def employee_position(self, request, *args, **kwargs):
+        if apps.is_installed('miq_hrm'):
+            Employee = apps.get_model('miq_hrm', 'Employee')
 
-    #     return self.retrieve(request, *args, **kwargs)
+            employee = Employee.objects.filter(user=self.request.user)
+            if employee.exists():
+                employee = employee.first()
+                employee.position = request.data.get('position')
+                employee.save()
 
-    # @action(methods=['post', 'patch'], detail=True)
-    # def avatar(self, request, *args, **kwargs):
-    #     if request.method == 'PATCH':
-    #         return self.retrieve(request, *args, **kwargs)
+            print(employee.position)
 
-    #     serializer = ProfileSerializer(
-    #         self.get_object().profile,
-    #         data=request.data,
-    #         partial=kwargs.pop('partial', False)
-    #     )
-    #     serializer.is_valid(raise_exception=True)
-    #     serializer.save()
-
-    #     return self.retrieve(request, *args, **kwargs)
+        return self.retrieve(request, *args, **kwargs)
 
     def get_object(self):
         return self.request.user

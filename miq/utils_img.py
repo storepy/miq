@@ -34,7 +34,7 @@ def crop_img_to_square(file):
     width, height = img.size
     if width > IMG_SIZE[0] and height > IMG_SIZE[1]:
         # keep ratio but shrink down
-        img.thumbnail((width, height))
+        img.thumbnail((width, height), PImage.ANTIALIAS)
         # img.show()
 
     # check which one is smaller
@@ -50,8 +50,10 @@ def crop_img_to_square(file):
         # make square by cutting off bottom
         left = 0
         right = width
-        top = 0
-        bottom = width
+        # top = 0
+        # bottom = width
+        top = (height - width) / 2
+        bottom = (height + width) / 2
         cropped = img.crop((left, top, right, bottom))
     else:
         cropped = img

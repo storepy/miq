@@ -3,6 +3,8 @@ from django.contrib.auth import get_user_model
 from django.contrib.auth.models import Permission
 # from django.contrib.contenttypes.models import ContentType
 
+from miq.utils import create_staffuser
+
 User = get_user_model()
 
 
@@ -40,6 +42,8 @@ class UserMixin:
         return user
 
     def create_staffuser(self, username, password):
+        return create_staffuser(username, password)
+
         user = User.objects.create_user(username=username)
         user.set_password(password)
         user.is_staff = True

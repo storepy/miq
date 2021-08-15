@@ -50,12 +50,18 @@ class ImageManager(models.Manager):
 
 class RendererMixin:
     def render_thumb_sq(self):
-        return self.render(
+        return self._render(
             'miq/components/img-square.html',
             context={'img': self, **self.to_json()}
         )
 
-    def render(self, template_name: str, context: dict = {}):
+    def render(self):
+        return self._render(
+            'miq/components/img.html',
+            context={'img': self, **self.to_json()}
+        )
+
+    def _render(self, template_name: str, context: dict = {}):
 
         if '.html' in template_name:
             return render_to_string(template_name, context)

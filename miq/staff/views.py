@@ -41,9 +41,7 @@ class AdminViewMixin(StaffLoginRequired):
             employee = Employee.objects.filter(user=self.request.user)
             if employee.exists():
                 employee = employee.first()
-                data['user']['employee'] = {
-                    'slug': employee.slug,
-                }
+                data['user']['employee'] = employee.to_dict()
 
                 company = employee.company
                 data['company'] = {

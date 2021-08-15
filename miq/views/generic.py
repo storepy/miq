@@ -24,3 +24,15 @@ class DetailView(ViewMixin, generic.DetailView):
 
 class TemplateView(ViewMixin, generic.TemplateView):
     pass
+
+
+class FormView(ViewMixin, generic.FormView):
+    pass
+
+
+class CreateView(ViewMixin, generic.CreateView):
+    pass
+
+
+class UpdateView(ViewMixin, generic.UpdateView):
+    pass

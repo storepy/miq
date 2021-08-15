@@ -59,20 +59,24 @@ class AccountSerializer(UserListSerializer):
     # Use in /accounts/account/
 
     class Meta(UserListSerializer.Meta):
+        read_only_fields = ('username', 'slug', 'email')
         fields = (
-            'username', 'slug', 'email',
-            'first_name', 'last_name', 'name', 'initials',
+            *read_only_fields,
+            # 'username', 'slug', 'email',
+            'first_name', 'last_name', 'name', 
+            'initials', 'gender', 'gender_label',
             'img', 'img_data',
             # 'birthdate', 'phone',
             # 'img', 'is_email_verified'
         )
-        read_only_fields = ('username', 'slug', 'email')
+        
 
     img = serializers.SlugRelatedField(
         slug_field="slug", queryset=Image.objects.all(), required=False
     )
 
     img_data = serializers.SerializerMethodField()
+    gender_label = serializers.ReadOnlyField()
 
     def get_img_data(self, obj):
         if obj.img:

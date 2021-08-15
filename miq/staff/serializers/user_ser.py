@@ -1,7 +1,6 @@
 
 
 from django.contrib.auth import get_user_model
-from rest_framework import serializers
 
 from miq.auth import AccountSerializer
 
@@ -17,5 +16,3 @@ class StaffUserSerializer(AccountSerializer):
             'initials', 'gender', 'gender_label',
             'img', 'img_data',
         )
-
-    gender_label = serializers.ReadOnlyField()

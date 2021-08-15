@@ -1,6 +1,7 @@
 from django.contrib.auth import get_user_model
 from django.contrib.sites.shortcuts import get_current_site
 
+
 from rest_framework import viewsets
 from rest_framework.serializers import ValidationError
 from rest_framework.parsers import JSONParser, MultiPartParser
