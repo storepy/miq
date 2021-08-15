@@ -2,18 +2,18 @@ from os import path
 from setuptools import setup, find_packages
 
 
-# import miq
+import miq
 
 here = path.abspath(path.dirname(__file__))
 
 setup(
     name='miq',
-    version='1.0.0',
+    version=miq.__version__,
     description='',
     long_description='',
     url='http://github.com/marqetintl/miq',
     author='marqetintl',
-    author_email='michaelgainyo@gmail.com',
+    author_email=miq.__email__,
     keywords='',
     license='',
     packages=find_packages(),
