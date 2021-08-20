@@ -42,17 +42,26 @@ class ImageSerializer(serializers.ModelSerializer):
 class UserListSerializer(serializers.ModelSerializer):
     class Meta:
         model = User
-        fields = (
+        read_only_fields = (
             'slug', 'username', 'initials',
             'first_name', 'last_name', 'name',
+            'img', 'img_data',
         )
-        read_only_fields = fields
+        fields = read_only_fields
 
     initials = serializers.ReadOnlyField()
     name = serializers.SerializerMethodField()
+    img = serializers.SlugRelatedField(
+        slug_field="slug", queryset=Image.objects.all(), required=False
+    )
+    img_data = serializers.SerializerMethodField()
 
     def get_name(self, obj):
         return obj.get_full_name()
+
+    def get_img_data(self, obj):
+        if obj.img:
+            return ImageSerializer(obj.img).data
 
 
 class AccountSerializer(UserListSerializer):
@@ -63,24 +72,14 @@ class AccountSerializer(UserListSerializer):
         fields = (
             *read_only_fields,
             # 'username', 'slug', 'email',
-            'first_name', 'last_name', 'name', 
+            'first_name', 'last_name', 'name',
             'initials', 'gender', 'gender_label',
             'img', 'img_data',
             # 'birthdate', 'phone',
             # 'img', 'is_email_verified'
         )
-        
 
-    img = serializers.SlugRelatedField(
-        slug_field="slug", queryset=Image.objects.all(), required=False
-    )
-
-    img_data = serializers.SerializerMethodField()
     gender_label = serializers.ReadOnlyField()
-
-    def get_img_data(self, obj):
-        if obj.img:
-            return ImageSerializer(obj.img).data
 
 
 """

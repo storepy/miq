@@ -3,7 +3,7 @@ from django.contrib.auth import get_user_model
 from django.contrib.auth.models import Permission
 # from django.contrib.contenttypes.models import ContentType
 
-from miq.utils import create_staffuser
+# from miq.utils import create_staffuser
 
 User = get_user_model()
 
@@ -27,9 +27,13 @@ class UserMixin:
 
         return self.create_user(username, password)
 
-    def add_user_perm(self,  user, codename):
+    def add_user_perm(self,  user, codename, refresh=True):
         perm = self.get_user_perm(codename)
         user.user_permissions.add(perm)
+
+        # to invalidate the cache
+        if refresh:
+            return self.refresh_user(user.username)
         return user
 
     def get_user_perm(self, codename):
@@ -42,7 +46,7 @@ class UserMixin:
         return user
 
     def create_staffuser(self, username, password):
-        return create_staffuser(username, password)
+        # return create_staffuser(username, password)
 
         user = User.objects.create_user(username=username)
         user.set_password(password)
@@ -57,7 +61,7 @@ class UserMixin:
         return user
 
     def refresh_user(self, username):
-        self.user = User.objects.get(username=username)
+        return User.objects.get(username=username)
 
 
 class SiteMixin:

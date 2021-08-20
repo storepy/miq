@@ -1,5 +1,6 @@
 from django.apps import apps
 from django.contrib.auth import get_user_model
+from django.core.validators import validate_ipv46_address
 
 
 def serialize_app_config(app_config):
@@ -37,8 +38,6 @@ def create_staffuser(username, password, **kwargs):
 
     user = User.objects.create_user(username=username, **kwargs, is_staff=True)
     user.set_password(password)
-    # user.is_staff = True
-    # user.save()
     assert user.is_staff == True
     return user
 
@@ -57,3 +56,15 @@ def get_text_choices(TextChoiceModel):
         {'name': choice.name, 'label': choice.label, 'value': choice.value}
         for choice in TextChoiceModel
     ]
+
+
+def get_ip(request):
+    try:
+        ip = request.META.get(
+            'HTTP_X_FORWARDED_FOR',
+            request.META.get('REMOTE_ADDR')
+        )
+        validate_ipv46_address(ip)
+    except Exception:
+        ip = None
+    return ip

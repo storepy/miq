@@ -1,0 +1,9 @@
+<div class="img-gallery-horizontal">
+  <div class="img-gallery-horizontal-inner">
+    {% for image in images %}
+    <div class="gallery-item">
+      <img src="{{image.src.url}}" alt="{{image.alt_text}}" />
+    </div>
+    {% endfor %}
+  </div>
+</div>
