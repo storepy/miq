@@ -103,8 +103,8 @@ class TestPageViewset(Mixin, APITestCase):
         r = self.client.get(list_path)
         self.assertEqual(r.status_code, status.HTTP_403_FORBIDDEN)
 
-        self.add_user_perm(self.user, 'view_page')
-        self.refresh_user(self.user.username)
+        self.user = self.add_user_perm(self.user, 'view_page')
+        # self.refresh_user(self.user.username)
         self.assertTrue(self.user.has_perm('miq.view_page'))
 
         r = self.client.get(list_path)

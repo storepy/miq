@@ -1,7 +1,7 @@
 from PIL import Image as PImage
 
 IMG_SIZE = (800, 1200)
-THUMB_SIZE = (250, 250)
+THUMB_SIZE = (450, 450)
 
 
 def get_thumbnail(file, width=THUMB_SIZE[0], height=THUMB_SIZE[1]):

@@ -22,6 +22,13 @@ class UserQuerySet(models.QuerySet):
             values=Concat(*keys, output_field=models.CharField())
         ).filter(values__icontains=q).distinct()
 
+    def with_perm(self, codename):
+        return self.filter(
+            models.Q(is_superuser=True) |
+            models.Q(user_permissions__codename=codename) |
+            models.Q(groups__permissions__codename=codename)
+        ).distinct()
+
     def staff(self):
         return self.filter(is_staff=True)
 
