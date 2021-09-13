@@ -1,6 +1,11 @@
 from django.apps import apps
+from django.utils.text import Truncator
 from django.contrib.auth import get_user_model
 from django.core.validators import validate_ipv46_address
+
+
+def truncate_str(string: str, *, lenght: int = 80):
+    return Truncator(string).chars(lenght)
 
 
 def serialize_app_config(app_config):

@@ -1,7 +1,7 @@
 from miq.utils import get_text_choices
 
 from .user_mod import User, UserGender
-from .image_mod import Image
+from .image_mod import Image, Thumbnail
 from .file_mod import File
 from .page_mod import Index, Page, PageSectionMeta
 from .section_mod import *
@@ -15,7 +15,7 @@ UserGenders = get_text_choices(UserGender)
 __all__ = (
     'BaseModelMixin',
     'User', 'UserGender', 'UserGenders',
-    'Image', 'File',
+    'Image', 'Thumbnail', 'File',
     'Index', 'Page', 'PageSectionMeta'
     # 'SectionType', 'Section', 'SectionImageMeta',
     # 'ImageSection', 'MarkdownSection', 'TextSection',

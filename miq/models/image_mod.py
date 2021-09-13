@@ -95,6 +95,8 @@ class Image(RendererMixin, BaseModelMixin):
         help_text="Select an image file",
         upload_to=upload_thumb_to,
         null=True, blank=True)
+    thumbnails = models.ManyToManyField(
+        "miq.Thumbnail", verbose_name=_("Thumbnails"), blank=True)
 
     caption = models.CharField(max_length=400, blank=True)
     alt_text = models.CharField(max_length=400, blank=True)
@@ -172,3 +174,33 @@ class Image(RendererMixin, BaseModelMixin):
     def deactivate(self):
         self.is_active = False
         self.save()
+
+
+# Thumbnail
+# Sizes
+
+
+class Thumbnail(RendererMixin, BaseModelMixin):
+    class Meta:
+        ordering = ('-updated', '-created')
+        verbose_name = _('Thumbnail')
+        verbose_name_plural = _('Thumbnails')
+
+    def __str__(self):
+        return f'{self.src}'
+
+    # image = models.ForeignKey(
+    #     "miq.Image",
+    #     verbose_name=_("Original Image"),
+    #     on_delete=models.CASCADE,
+    #     related_name='thumbnails'
+    # )
+
+    src = models.ImageField(
+        max_length=500,
+        verbose_name="Thumbnail",
+        help_text="Select an image file",
+        upload_to=upload_thumb_to,
+        # null=True, blank=True
+    )
+    is_square = models.BooleanField(default=False)

@@ -57,6 +57,9 @@ class File(BaseModelMixin):
         help_text=_("Select a file"),
         upload_to=upload_to)
 
+    thumbnails = models.ManyToManyField(
+        "miq.Thumbnail", verbose_name=_("Thumbnails"), blank=True)
+
     objects = FileManager()
 
     class Meta:

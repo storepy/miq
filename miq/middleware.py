@@ -9,14 +9,9 @@ class SiteMiddleware(CurrentSiteMiddleware):
         self.get_response = get_response
 
     def __call__(self, request):
+        self.process_request(request)
+
         response = self.get_response(request)
-
-        # try:
-        #     create_hit(request, response)
-
-        # except Exception as e:
-        #     print('\n\n==>', e, '\n\n')
-
         return response
 
     def process_request(self, request):
@@ -83,15 +78,14 @@ class CORSMiddleware(object):
 
     def __call__(self, request):
         response = self.get_response(request)
-
-        self.process_response(request, response)
+        self.process_response(response)
 
         # from pprint import pprint
         # pprint(request.headers.__dict__)
 
         return response
 
-    def process_response(self, request, response):
+    def process_response(self, response):
         response["Access-Control-Allow-Origin"] = settings.CORS_ORIGIN
         response["Access-Control-Allow-Headers"] = "X-CSRFTOKEN, x-requested-with, Content-Type, Accept, Origin"
         response["Access-Control-Allow-Methods"] = "OPTIONS, GET, POST, PUT, DELETE, PATCH"
