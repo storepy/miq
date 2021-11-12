@@ -4,6 +4,7 @@ from uuid import uuid4
 from django.db import models
 from django.utils import timezone
 from django.utils.timesince import timesince
+from django.utils.text import slugify
 from django.contrib.sites.models import Site
 from django.utils.translation import gettext_lazy as _
 
@@ -86,28 +87,6 @@ class PageManager(models.Manager):
 
 
 class Page(AbstractPage):
-    class Meta:
-        ordering = ('-created', '-updated')
-        verbose_name = _('Page')
-        verbose_name_plural = _('Page')
-
-    def __str__(self):
-        return f'{self.site.name} {self.label} page'
-
-    def save(self, *args, **kwargs):
-
-        # if not self.slug_pk:
-        #     self.slug_pk = uuid4()
-
-        if self.is_published and not self.dt_published:
-            self.dt_published = timezone.now()
-
-        super().save(*args, **kwargs)
-
-        sections = self.sections.exclude(source=self.slug)
-        if sections.exists():
-            sections.update(source=self.slug)
-
     # From Abstract:  title
     # From related: children
 
@@ -127,11 +106,11 @@ class Page(AbstractPage):
     )
 
     # MUST BE the same as related name
-    source = models.CharField(max_length=100, blank=True, null=True)
+    source = models.CharField(max_length=100, blank=True, null=True) 
 
     label = models.CharField(max_length=100, help_text=_('Page header label'))
 
-    # For public and system use
+    # For public display
     slug_public = models.SlugField(
         max_length=100, unique=True, db_index=True,
         default=uuid4
@@ -143,6 +122,27 @@ class Page(AbstractPage):
         blank=True, null=True, help_text=_('Publication date'))
 
     objects = PageManager()
+
+    def save(self, *args, **kwargs):
+        if self.slug_public:
+            self.slug_public = slugify(self.slug_public)
+
+        if self.is_published and not self.dt_published:
+            self.dt_published = timezone.now()
+
+        super().save(*args, **kwargs)
+
+        sections = self.sections.exclude(source=self.slug)
+        if sections.exists():
+            sections.update(source=self.slug)
+
+    def __str__(self):
+        return f'{self.site.name}: {self.label or self.title} | {self.source} page'
+
+    class Meta:
+        ordering = ('-created', '-updated')
+        verbose_name = _('Page')
+        verbose_name_plural = _('Page')
 
     @property
     def updated_since(self):

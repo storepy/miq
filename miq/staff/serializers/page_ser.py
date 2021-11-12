@@ -1,17 +1,18 @@
+from django.contrib.sites.shortcuts import get_current_site
+
 from rest_framework import serializers
 
 from miq.models import Page
-
-
-class PageSerializer(serializers.ModelSerializer):
+from miq.mixins import ModelSerializerMixin
+ 
+class PageSerializer(ModelSerializerMixin, serializers.ModelSerializer):
     class Meta:
         model = Page
-        read_only_fields = ('dt_published', 'sections', 'children')
+        read_only_fields = ('slug','dt_published', 'sections', 'children', 'updated_since',)
         fields = (
+            # 'site',
+            'slug_public', 'title', 'label', 'is_published',
             *read_only_fields,
-            'slug_public', 'slug',
-            'label', 'is_published',
-            'updated_since',
             # 'sections_data',
         )
 
@@ -24,3 +25,8 @@ class PageSerializer(serializers.ModelSerializer):
         many=True,
         # queryset=Section.objects.all(), required=False
     )
+
+    def create(self, validated_data):
+        validated_data.update({'site':get_current_site(self.get_request())})
+        return super().create(validated_data)
+

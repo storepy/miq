@@ -36,7 +36,9 @@ class ImageViewset(DevLoginRequiredMixin, viewsets.ModelViewSet):
     parser_classes = (JSONParser,  MultiPartParser)
 
     def get_queryset(self):
-        qs = Image.objects.active().site(get_current_site(self.request))
+        qs = Image.objects.active()\
+            .user(self.request.user)\
+            .site(get_current_site(self.request))
         return qs
 
     def perform_create(self, ser):

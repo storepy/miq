@@ -1,3 +1,10 @@
+from django.db import models
+# from django.utils.text import Truncator
+from django.contrib.sites.models import Site
+# from django.contrib.auth import get_user_model
+
+from django.utils.translation import gettext_lazy as _
+
 from miq.utils import get_text_choices
 
 from .user_mod import User, UserGender
@@ -18,5 +25,71 @@ __all__ = (
     'Image', 'Thumbnail', 'File',
     'Index', 'Page', 'PageSectionMeta'
     # 'SectionType', 'Section', 'SectionImageMeta',
-    # 'ImageSection', 'MarkdownSection', 'TextSection',
+    # 'ImageSection', 'MarkdownSection', 'TextSection', 'JumbotronSection
 )
+
+
+class SiteSetting(BaseModelMixin):
+
+    site = models.OneToOneField(
+        Site, on_delete=models.CASCADE,
+        related_name='settings', default=1)
+
+    # CONTACT
+    contact_email = models.EmailField(
+        max_length=400, blank=True,
+        help_text=_('Preferred contact email'))
+    #
+
+    is_live = models.BooleanField(
+        default=False,
+        help_text=_('Turn off to prevent access to your website'))
+
+    close_template = models.OneToOneField(
+        'miq.JumbotronSection',
+        blank=True, null=True, on_delete=models.SET_NULL,
+        help_text=_('This template appears when the site is not live'))
+
+    # ANALYTICS
+
+    ga_tracking = models.TextField(
+        blank=True, null=True,
+        verbose_name='Google Analytics Tracking ID',
+        help_text='Google Analytics Measurement ID')
+
+    fb_pixel = models.TextField(
+        blank=True, null=True,
+        verbose_name='Facebook Pixel ID',
+        help_text='Facebook Pixel ID')
+
+    #
+    # extra = models.JSONField(default=setting_extra, blank=True)
+
+    class Meta:
+        ordering = ('-created',)
+        verbose_name = _('Site Settings')
+        verbose_name_plural = _('Site Settings')
+
+    def __str__(self):
+        return f'Settings: {self.site}'
+
+    # def save(self, *args, **kwargs):
+    #     if not self.close_template:
+    #         self.add_close_template(
+    #             title='Please come back later!',
+    #             text='This site is currently under construction.'
+    #         )
+
+    #     self.extra = {**setting_extra(), **self.extra}
+    #     super().save(*args, **kwargs)
+
+    @property
+    def display_contact_email(self):
+        if self.contact_email:
+            return self.contact_email.replace('@', '[at]')
+
+    # def add_close_template(self, title, text):
+    #     from .section_proxies import JumbotronSection
+
+    #     self.close_template = JumbotronSection.objects.create(
+    #         title=title, text=text)

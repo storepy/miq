@@ -1,0 +1,8 @@
+<div class="">
+{% if site.settings.close_template.html %}
+    {% include 'miq/section.html' with section=site.settings.close_template %}        
+{% else %}
+    {{site.settings.close_template.text | default:'This site is currently under construction. Please come back later!'}}
+{% endif %}
+
+</div>

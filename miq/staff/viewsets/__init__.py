@@ -3,13 +3,17 @@ from django.contrib.sites.shortcuts import get_current_site
 
 from rest_framework import status, viewsets, mixins
 from rest_framework.decorators import action
+from rest_framework.generics import get_object_or_404
 from rest_framework.response import Response
 from rest_framework.parsers import JSONParser
 from rest_framework.permissions import IsAdminUser
 
-from miq.models import Page, Index
+from miq.models import Page, Index, SiteSetting
+from miq.staff.serializers import (
+    AdminSiteSerializer, AdminSiteSettingSerializer
+)
 
-from miq.mixins import DevLoginRequiredMixin
+from miq.mixins import StaffLoginRequired
 from miq.permissions import DjangoModelPermissions
 from miq.auth import UserListSerializer, SectionSerializer
 
@@ -32,7 +36,7 @@ class PagePermissions(DjangoModelPermissions):
         return super().has_permission(request, view)
 
 
-class PagesActionMixin(DevLoginRequiredMixin):
+class PagesActionMixin(StaffLoginRequired):
     @action(methods=['post'], detail=True, url_path=r'section')
     def section(self, request, *args, **kwargs):
         """
@@ -57,9 +61,9 @@ class PageViewset(PagesActionMixin, viewsets.ModelViewSet):
     parser_classes = (JSONParser, )
     permission_classes = (IsAdminUser, PagePermissions)
 
-    def perform_create(self, serializer):
-        # TODO: Enforce
-        serializer.save(site=get_current_site(self.request))
+    # def perform_create(self, serializer):
+    #     # TODO: Enforce
+    #     serializer.save(site=get_current_site(self.request))
 
     def get_queryset(self):
         qs = super().get_queryset()
@@ -104,7 +108,7 @@ class IndexViewset(
 
 
 class StaffSearchView(
-        DevLoginRequiredMixin, mixins.ListModelMixin, viewsets.GenericViewSet):
+        StaffLoginRequired, mixins.ListModelMixin, viewsets.GenericViewSet):
     queryset = User.objects.none()
     serializer_class = UserListSerializer
     permission_classes = (IsAdminUser,)
@@ -118,3 +122,40 @@ class StaffSearchView(
                 .search(q)
 
         return self.queryset
+
+
+"""
+SITE
+"""
+
+
+class SiteSettingViewset(
+    StaffLoginRequired, mixins.RetrieveModelMixin, mixins.UpdateModelMixin,
+        viewsets.GenericViewSet):
+    lookup_field = 'slug'
+    serializer_class = AdminSiteSettingSerializer
+    queryset = SiteSetting.objects.none()
+    # permission_classes = []
+    parser_classes = (JSONParser,)
+
+    @action(methods=['patch'], detail=True, url_path=r'site')
+    def site(self, request, *args, **kwargs):
+        # TODO: Validate domain(enforce ".")
+
+        ser = AdminSiteSerializer(
+            self.get_object().site,
+            data=request.data, partial=True
+            # partial=kwargs.pop('partial', False)
+        )
+        if ser.is_valid(raise_exception=True):
+            ser.save()
+
+        return self.retrieve(request, *args, **kwargs)
+
+    def get_object(self):
+        return get_object_or_404(
+            SiteSetting, site=get_current_site(self.request)
+        )
+        # return SiteSetting.objects.filter(
+        #     site=get_current_site(self.request)
+        # ).first()

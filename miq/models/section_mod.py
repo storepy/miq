@@ -8,7 +8,7 @@ from .mixins import BaseModelMixin
 
 __all__ = [
     'SectionType', 'Section', 'SectionImageMeta',
-    'ImageSection', 'MarkdownSection', 'TextSection',
+    'ImageSection', 'MarkdownSection', 'TextSection', 'JumbotronSection'
 
 ]
 
@@ -101,6 +101,15 @@ class SectionImageMeta(SectionAbstract):
 
 
 # PROXIES
+
+
+class JumbotronSection(Section):
+    class Meta:
+        proxy = True
+
+    def save(self, *args, **kwargs):
+        self.type = SectionType.JUMB
+        super().save(*args, **kwargs)
 
 
 class ImageSection(Section):

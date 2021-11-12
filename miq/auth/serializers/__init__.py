@@ -3,7 +3,7 @@ from django.contrib.auth import get_user_model
 from rest_framework import serializers
 
 from miq.models import File, Image
-from miq.models import Section, ImageSection, MarkdownSection, TextSection
+from miq.models import Section, ImageSection, MarkdownSection, TextSection, JumbotronSection
 
 User = get_user_model()
 
@@ -104,6 +104,22 @@ class SectionSerializer(serializers.ModelSerializer):
 
 
 """
+# JUMBOTRON SECTION
+"""
+
+
+class JumbotronSectionSerializer(SectionSerializer):
+    class Meta(SectionSerializer.Meta):
+        model = JumbotronSection
+        read_only_fields = ('slug',)
+        fields = (
+            'title', 'text',
+            'html', 'position', 'image', 'images', 'url',
+            *read_only_fields
+        )
+
+
+"""
 # IMAGE SECTION
 """
 
@@ -111,6 +127,7 @@ class SectionSerializer(serializers.ModelSerializer):
 class ImageSectionSerializer(SectionSerializer):
     class Meta(SectionSerializer.Meta):
         model = ImageSection
+        read_only_fields = ('slug',)
         fields = ('slug', 'type', 'html', 'image', 'position',)
 
 
@@ -122,6 +139,7 @@ class ImageSectionSerializer(SectionSerializer):
 class MarkdownSectionSerializer(SectionSerializer):
     class Meta(SectionSerializer.Meta):
         model = MarkdownSection
+        read_only_fields = ('slug',)
         fields = (
             'slug', 'type', 'title', 'text',
             'html', 'position', 'nodes'

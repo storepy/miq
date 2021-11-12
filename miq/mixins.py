@@ -3,6 +3,14 @@ from django.http import HttpResponse
 from django.contrib.auth.mixins import LoginRequiredMixin
 
 
+class ModelSerializerMixin:
+    def get_request(self):
+        try:
+            return self._kwargs.get('context').get('request')
+        except Exception:
+            return None
+
+
 class DevLoginRequiredMixin(LoginRequiredMixin):
 
     def dispatch(self, request, *args, **kwargs):

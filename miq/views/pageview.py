@@ -8,6 +8,8 @@ from miq.models import Page
 from .generic import DetailView
 
 
+
+
 class PageView(DetailView):
     model = Page
     template_name = 'miq/page.html'
