@@ -6,11 +6,10 @@ from django.utils.translation import gettext_lazy as _
 from .mixins import BaseModelMixin
 
 
-__all__ = [
-    'SectionType', 'Section', 'SectionImageMeta',
+__all__ = (
+    'SectionType', 'Section', 'SectionImageMeta', 'CloseTemplateSection',
     'ImageSection', 'MarkdownSection', 'TextSection', 'JumbotronSection'
-
-]
+)
 
 
 class SectionType(models.TextChoices):
@@ -27,6 +26,9 @@ class SectionType(models.TextChoices):
 
     # Embed
     EMBED = 'EMBED', _('Embed')
+
+    # CLOSE TEMPLATE
+    CLOSE = 'CLOSE', _('Close Template')
 
 
 class SectionAbstract(BaseModelMixin):
@@ -136,4 +138,13 @@ class TextSection(Section):
 
     def save(self, *args, **kwargs):
         self.type = SectionType.TXT
+        super().save(*args, **kwargs)
+
+
+class CloseTemplateSection(Section):
+    class Meta:
+        proxy = True
+
+    def save(self, *args, **kwargs):
+        self.type = SectionType.CLOSE
         super().save(*args, **kwargs)

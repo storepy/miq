@@ -23,7 +23,8 @@ __all__ = (
     'BaseModelMixin',
     'User', 'UserGender', 'UserGenders',
     'Image', 'Thumbnail', 'File',
-    'Index', 'Page', 'PageSectionMeta'
+    'Index', 'Page', 'PageSectionMeta',
+    'CloseTemplateSection',
     # 'SectionType', 'Section', 'SectionImageMeta',
     # 'ImageSection', 'MarkdownSection', 'TextSection', 'JumbotronSection
 )
@@ -49,6 +50,13 @@ class SiteSetting(BaseModelMixin):
         'miq.JumbotronSection',
         blank=True, null=True, on_delete=models.SET_NULL,
         help_text=_('This template appears when the site is not live'))
+
+    # LOGO
+
+    logo = models.OneToOneField(
+        "miq.Image", verbose_name=_("Logo"),
+        on_delete=models.SET_NULL, null=True, blank=True
+    )
 
     # ANALYTICS
 

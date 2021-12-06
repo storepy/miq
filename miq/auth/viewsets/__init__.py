@@ -12,13 +12,13 @@ from miq.mixins import DevLoginRequiredMixin
 
 from ..serializers import (
     # images
-    ImageSerializer, ImageSectionSerializer,
+    ImageSerializer,
 
     # files
     FileSerializer,
 
     # sections
-    SectionSerializer, TextSectionSerializer, MarkdownSectionSerializer,
+    sections_serializer_classes, SectionSerializer
 )
 
 User = get_user_model()
@@ -49,12 +49,6 @@ class ImageViewset(DevLoginRequiredMixin, viewsets.ModelViewSet):
 SECTION
 """
 
-sections_serializer_classes = {
-    'IMG': ImageSectionSerializer,
-    'TXT': TextSectionSerializer,
-    'MD': MarkdownSectionSerializer,
-}
-
 
 class SectionViewset(DevLoginRequiredMixin, viewsets.ModelViewSet):
     lookup_field = 'slug'
@@ -70,18 +64,25 @@ class SectionViewset(DevLoginRequiredMixin, viewsets.ModelViewSet):
             if not source or source == '':
                 return Section.objects.none()
 
+            source_type = params.get('source_type')
+            if source_type == 'index':
+                return Section.objects.filter(index__slug=source)
+
+            if source_type == 'page':
+                return Section.objects.filter(page__slug=source)
+
             return Section.objects.filter(source=source)
 
         return super().get_queryset(*args, **kwargs)
 
     def get_serializer_class(self):
-        if self.action == 'update' or self.action == 'partial_update':
-            type = self.request.data.get('type')
-            if not type:
-                raise ValidationError({'type': 'Section type required.'})
+        # if self.action == 'update' or self.action == 'partial_update':
+        #     type = self.request.data.get('type')
+        #     if not type:
+        #         raise ValidationError({'type': 'Section type required.'})
 
-            if type in sections_serializer_classes.keys():
-                return sections_serializer_classes.get(type)
+        #     if type in sections_serializer_classes.keys():
+        #         return sections_serializer_classes.get(type)
 
         return super().get_serializer_class()
 

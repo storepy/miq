@@ -1,9 +1,11 @@
+
 from django.contrib.auth import get_user_model
 
 from rest_framework import serializers
 
 from miq.models import File, Image
-from miq.models import Section, ImageSection, MarkdownSection, TextSection, JumbotronSection
+from miq.models import CloseTemplateSection, TextSection
+from miq.models import Section, ImageSection, MarkdownSection, JumbotronSection
 
 User = get_user_model()
 
@@ -90,13 +92,15 @@ class AccountSerializer(UserListSerializer):
 class SectionSerializer(serializers.ModelSerializer):
     class Meta:
         model = Section
+        read_only_fields = ('slug', 'image')
         fields = (
-            'slug', 'title', 'type', 'text', 'url', 'html', 'position',
-            'image', 'images', 'nodes',
+            *read_only_fields,
+            'title', 'type', 'text', 'url', 'html', 'position',
+            'images', 'nodes',
             # 'images_data',
         )
-        read_only_fields = ('slug', 'image')
 
+    image = ImageSerializer(required=False)
     images = serializers.SlugRelatedField(
         slug_field='slug',
         # TODO: Filter active
@@ -111,11 +115,11 @@ class SectionSerializer(serializers.ModelSerializer):
 class JumbotronSectionSerializer(SectionSerializer):
     class Meta(SectionSerializer.Meta):
         model = JumbotronSection
-        read_only_fields = ('slug',)
+        read_only_fields = ('slug', 'image')
         fields = (
-            'title', 'text',
-            'html', 'position', 'image', 'images', 'url',
-            *read_only_fields
+            *read_only_fields,
+            'title', 'text', 'type',
+            'html', 'position', 'images', 'url',
         )
 
 
@@ -128,7 +132,7 @@ class ImageSectionSerializer(SectionSerializer):
     class Meta(SectionSerializer.Meta):
         model = ImageSection
         read_only_fields = ('slug',)
-        fields = ('slug', 'type', 'html', 'image', 'position',)
+        fields = (*read_only_fields, 'type', 'html', 'image', 'position',)
 
 
 """
@@ -141,7 +145,7 @@ class MarkdownSectionSerializer(SectionSerializer):
         model = MarkdownSection
         read_only_fields = ('slug',)
         fields = (
-            'slug', 'type', 'title', 'text',
+            *read_only_fields, 'type', 'title', 'text',
             'html', 'position', 'nodes'
         )
 
@@ -154,6 +158,39 @@ class MarkdownSectionSerializer(SectionSerializer):
 class TextSectionSerializer(MarkdownSectionSerializer):
     class Meta(MarkdownSectionSerializer.Meta):
         model = TextSection
+
+
+"""
+# CLOSE TEMPLATE SECTION
+"""
+
+
+class CloseTemplateSectionSerializer(SectionSerializer):
+    class Meta(SectionSerializer.Meta):
+        model = CloseTemplateSection
+        read_only_fields = ('slug',)
+        fields = (
+            *read_only_fields,
+            'type', 'title', 'text',
+            'html', 'image', 'images'
+        )
+
+
+"""
+
+"""
+
+sections_serializer_classes = {
+    'IMG': ImageSectionSerializer,
+    'TXT': TextSectionSerializer,
+    'MD': MarkdownSectionSerializer,
+    'JUMB': JumbotronSectionSerializer,
+    'CLOSE': CloseTemplateSectionSerializer,
+}
+
+
+def get_section_serializer(type):
+    return sections_serializer_classes.get(type.upper(), SectionSerializer)
 
 
 """

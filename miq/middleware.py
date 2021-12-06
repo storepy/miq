@@ -47,11 +47,19 @@ class SiteMiddleware(CurrentSiteMiddleware):
 
         site = Site.objects.filter(id=site.id).first()
         ctx['site'] = site
+        if site:
+            ctx['is_live'] = site.settings.is_live
+            ctx['close_template'] = site.settings.close_template
 
         if 'sharedData' not in ctx.keys():
             ctx['sharedData'] = {}
 
-        # sD = ctx.get('sharedData')
+        sD = ctx.get('sharedData')
+        if 'site' not in sD:
+            ctx.get('sharedData').update({
+                'site': {'name': site.name, 'domain': site.domain}
+            })
+
         # sD['site'] = SiteSerializer(
         #     site, context={'request': request}, read_only=True).data
 

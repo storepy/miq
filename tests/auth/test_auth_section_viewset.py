@@ -42,6 +42,8 @@ class TestSectionViewset(Mixin, APITestCase):
         section = Section.objects.create(site=self.site)
         path = reverse_lazy('miq:section-detail', args=[section.slug])
         r = self.client.patch(path, data={}, format='json')
+
+        # Fails
         self.assertEqual(r.status_code, status.HTTP_400_BAD_REQUEST)
 
     def test_create(self):

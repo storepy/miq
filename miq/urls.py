@@ -25,7 +25,7 @@ auth_router.register(r'pages', PageViewset)
 auth_router.register(r'sections', SectionViewset)
 auth_router.register(r'index', IndexViewset)
 auth_router.register(r'images', ImageViewset)
-auth_router.register(r'staffimages', StaffImageViewset)
+auth_router.register(r'staffimages', StaffImageViewset, 'staffimage')
 auth_router.register(r'files', FileViewset)
 auth_router.register(r'settings', SiteSettingViewset)
 

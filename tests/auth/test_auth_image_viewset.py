@@ -13,6 +13,8 @@ from miq.tests.mixins import TestMixin
 TEST_MEDIA_DIR = 'test_media'
 list_path = reverse_lazy('miq:image-list')
 
+print(list_path)
+
 
 class Mixin(TestMixin):
     pass
@@ -24,7 +26,7 @@ class TestImageViewset(Mixin, APITestCase):
         super().setUp()
 
         self.get_user()
-        self.client.login(
+        self.is_logged_in = self.client.login(
             username=self.username,
             password=self.password)
 
@@ -39,17 +41,24 @@ class TestImageViewset(Mixin, APITestCase):
 
     def test_create(self):
         # TODO: Require site slug on create
+        self.assertTrue(self.is_logged_in)
+
         r = self.client.post(
             list_path, data={'src': get_temp_img()},
             format='multipart'
         )
         self.assertEqual(r.status_code, status.HTTP_201_CREATED)
 
+        print('Hey')
+
         slug = r.data.get('slug')
         image = Image.objects.get(slug=slug)
 
         self.assertEqual(image.site, self.site)
         self.assertEqual(image.user.username, self.username)
+
+        # thumbnails
+        # self.assertEqual(image.thumbnails.count(), 1)
 
     # test_src_required
 

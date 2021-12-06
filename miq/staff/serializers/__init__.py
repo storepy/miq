@@ -3,7 +3,9 @@ from django.contrib.sites.models import Site
 from django.urls import reverse_lazy
 
 from miq.models import SiteSetting
-from miq.auth.serializers import JumbotronSectionSerializer
+from miq.auth.serializers import ImageSerializer
+from miq.auth.serializers import CloseTemplateSectionSerializer
+from miq.models.image_mod import Image
 from .index_ser import IndexSerializer
 from .page_ser import PageSerializer
 from .user_ser import StaffUserSerializer
@@ -45,9 +47,18 @@ class AdminSiteSettingSerializer(serializers.ModelSerializer):
         read_only_fields = ('slug', 'site', 'close_template')
         fields = (
             'contact_email', 'is_live',
+            'logo', 'logo_data',
             'ga_tracking', 'fb_pixel',
             *read_only_fields
         )
 
     site = AdminSiteSerializer(required=False)
-    close_template = JumbotronSectionSerializer(required=False)
+    logo = serializers.SlugRelatedField(
+        slug_field="slug", queryset=Image.objects.active(),  required=False,)
+    logo_data = serializers.SerializerMethodField()
+    close_template = CloseTemplateSectionSerializer(required=False)
+
+    def get_logo_data(self, instance):
+        if (logo := instance.logo):
+            return ImageSerializer(logo).data
+        return None
