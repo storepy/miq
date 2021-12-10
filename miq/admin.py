@@ -2,11 +2,10 @@ from django.contrib import admin
 from django.contrib.auth import get_user_model
 from django.contrib.auth.admin import UserAdmin
 
-from .models import (
-    Section,
-    Image,
-    Index, Page, PageSectionMeta
-)
+from .models import SiteSetting
+from .models import Image, Thumbnail
+from .models import Section
+from .models import Index, Page, PageSectionMeta
 
 CustomUser = get_user_model()
 
@@ -26,6 +25,10 @@ class CustomUserAdmin(UserAdmin):
 # admin.site.register(CustomUser, CustomUserAdmin)
 
 admin.site.register(Image)
+admin.site.register(Thumbnail)
+
+admin.site.register(SiteSetting)
+
 admin.site.register(Section)
 
 admin.site.register(Index)

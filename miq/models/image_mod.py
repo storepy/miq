@@ -83,6 +83,13 @@ class Image(RendererMixin, BaseModelMixin):
         verbose_name="Source",
         help_text="Select an image file",
         upload_to=upload_to)
+    src_mobile = models.ImageField(
+        max_length=500,
+        verbose_name="Source mobile",
+        help_text="Select an image file",
+        upload_to=upload_to,
+        null=True, blank=True)
+
     thumb_sq = models.ImageField(
         max_length=500,
         verbose_name="Square Thumbnail",
@@ -114,20 +121,26 @@ class Image(RendererMixin, BaseModelMixin):
         return f'{self.src}'
 
     def save(self, *args, **kwargs):
-        self.thumb.save(
-            self.src.url.split('/')[-1],
-            self.src.file, save=False)
-        self.thumb_sq.save(
-            self.src.url.split('/')[-1],
-            self.src.file, save=False)
+        if not self.pk:
+            self.src_mobile.save(
+                self.src.url.split('/')[-1],
+                self.src.file, save=False)
+            self.thumb.save(
+                self.src.url.split('/')[-1],
+                self.src.file, save=False)
+            self.thumb_sq.save(
+                self.src.url.split('/')[-1],
+                self.src.file, save=False)
 
         super().save(*args, **kwargs)
 
-        try:
-            get_thumbnail(file=self.thumb).save(self.thumb.path)
-            crop_img_to_square(file=self.thumb).save(self.thumb_sq.path)
-        except Exception:
-            pass
+        if not self.pk:
+            try:
+                get_thumbnail(file=self.src_mobile).save(self.src_mobile.path)
+                get_thumbnail(file=self.thumb).save(self.thumb.path)
+                crop_img_to_square(file=self.thumb).save(self.thumb_sq.path)
+            except Exception:
+                pass
 
     @property
     def name_truncated(self):
@@ -142,12 +155,27 @@ class Image(RendererMixin, BaseModelMixin):
         return self.src.width
 
     @property
+    def width_mobile(self):
+        if self.src_mobile:
+            return self.src_mobile.width
+
+    @property
     def height(self):
         return self.src.height
 
     @property
+    def height_mobile(self):
+        if self.src_mobile:
+            return self.src_mobile.height
+
+    @property
     def size(self):
         return filesizeformat(self.src.size)
+
+    @property
+    def size_mobile(self):
+        if self.src_mobile:
+            return filesizeformat(self.src_mobile.size)
 
     def to_json(self):
         """Serialize an image"""

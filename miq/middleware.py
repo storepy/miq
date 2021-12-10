@@ -3,6 +3,8 @@ from django.contrib.sites.models import Site
 from django.contrib.sites.middleware import CurrentSiteMiddleware
 from django.contrib.sites.shortcuts import get_current_site
 
+from miq.models import SiteSetting
+
 
 class SiteMiddleware(CurrentSiteMiddleware):
     def __init__(self, get_response):
@@ -45,11 +47,28 @@ class SiteMiddleware(CurrentSiteMiddleware):
 
         ctx['is_live'] = False
 
+        # SITE
+
         site = Site.objects.filter(id=site.id).first()
         ctx['site'] = site
-        if site:
-            ctx['is_live'] = site.settings.is_live
-            ctx['close_template'] = site.settings.close_template
+
+        # SITE SETTING
+
+        settings = SiteSetting.objects.filter(site=site).first()
+        if settings:
+            ctx['is_live'] = settings.is_live
+            ctx['close_template'] = {
+                'html': settings.ct_html,
+                'title': settings.ct_title,
+                'text': settings.ct_text
+            }
+
+            if settings.ga_tracking:
+                ctx['ga_tracking'] = settings.ga_tracking.strip()
+            if settings.fb_pixel:
+                ctx['fb_pixel'] = settings.fb_pixel.strip()
+
+        # SHARED DATA
 
         if 'sharedData' not in ctx.keys():
             ctx['sharedData'] = {}
@@ -63,7 +82,6 @@ class SiteMiddleware(CurrentSiteMiddleware):
         # sD['site'] = SiteSerializer(
         #     site, context={'request': request}, read_only=True).data
 
-        # settings = Setting.objects.filter(site=site).first()
         # if settings:
         #     is_live = settings.is_live
         #     ctx['settings'] = settings
@@ -72,9 +90,6 @@ class SiteMiddleware(CurrentSiteMiddleware):
         #     # TODO: '/login' path
         #     if not is_live and not request.user.is_authenticated:
         #         del ctx['sharedData']
-
-        #     if settings.ga_tracking:
-        #         ctx['ga_tracking'] = settings.ga_tracking.strip()
 
         return response
 

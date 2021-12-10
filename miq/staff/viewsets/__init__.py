@@ -138,6 +138,9 @@ class SiteSettingViewset(
     # permission_classes = []
     parser_classes = (JSONParser,)
 
+    # @action(methods=['patch'], detail=True, url_path=r'close')
+    # def close_template_update(self, request, *args, **kwargs):
+
     @action(methods=['patch'], detail=True, url_path=r'site')
     def site(self, request, *args, **kwargs):
         # TODO: Validate domain(enforce ".")

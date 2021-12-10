@@ -18,15 +18,16 @@ User = get_user_model()
 class ImageSerializer(serializers.ModelSerializer):
     class Meta:
         model = Image
-        fields = (
-            'slug', 'src', 'thumb', 'thumb_sq',
-            'alt_text', 'caption', 'position',
-            'name', 'name_truncated', 'height', 'width', 'size',
+        read_only_fields = (
+            'slug', 'name', 'name_truncated',
+            'height', 'width', 'size',
+            'height_mobile', 'width_mobile', 'size_mobile',
             'created', 'updated',
         )
-        read_only_fields = (
-            'slug', 'name', 'name_truncated', 'height', 'width', 'size',
-            'created', 'updated',
+        fields = (
+            'src', 'src_mobile', 'thumb', 'thumb_sq',
+            'alt_text', 'caption', 'position',
+            *read_only_fields
         )
 
     name = serializers.ReadOnlyField()
@@ -34,6 +35,9 @@ class ImageSerializer(serializers.ModelSerializer):
     width = serializers.ReadOnlyField()
     height = serializers.ReadOnlyField()
     size = serializers.ReadOnlyField()
+    width_mobile = serializers.ReadOnlyField()
+    height_mobile = serializers.ReadOnlyField()
+    size_mobile = serializers.ReadOnlyField()
 
 
 """

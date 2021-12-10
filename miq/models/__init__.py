@@ -70,6 +70,20 @@ class SiteSetting(BaseModelMixin):
         verbose_name='Facebook Pixel ID',
         help_text='Facebook Pixel ID')
 
+    # CLOSE TEMPLATE
+
+    ct_title = models.CharField(max_length=200, blank=True, null=True)
+    ct_text = models.TextField(blank=True, null=True)
+    ct_html = models.TextField(blank=True, null=True)
+    ct_image = models.OneToOneField(
+        "miq.Image", verbose_name=_("Close Image"),
+        on_delete=models.SET_NULL, blank=True, null=True,
+        related_name='site_setting')
+
+    # ct_url = models.URLField(
+    #     null=True, blank=True,
+    #     help_text=_('Call to action or link url'))
+
     #
     # extra = models.JSONField(default=setting_extra, blank=True)
 

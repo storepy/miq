@@ -44,11 +44,11 @@ class AdminSiteSerializer(serializers.ModelSerializer):
 class AdminSiteSettingSerializer(serializers.ModelSerializer):
     class Meta:
         model = SiteSetting
-        read_only_fields = ('slug', 'site', 'close_template')
+        read_only_fields = ('slug', 'site', 'logo_data', 'ct_image_data')
         fields = (
-            'contact_email', 'is_live',
-            'logo', 'logo_data',
+            'is_live', 'contact_email', 'logo',
             'ga_tracking', 'fb_pixel',
+            'ct_title', 'ct_text', 'ct_html', 'ct_image',
             *read_only_fields
         )
 
@@ -56,9 +56,14 @@ class AdminSiteSettingSerializer(serializers.ModelSerializer):
     logo = serializers.SlugRelatedField(
         slug_field="slug", queryset=Image.objects.active(),  required=False,)
     logo_data = serializers.SerializerMethodField()
-    close_template = CloseTemplateSectionSerializer(required=False)
+    ct_image = serializers.SlugRelatedField(
+        slug_field="slug", queryset=Image.objects.active(),  required=False,)
+    ct_image_data = serializers.SerializerMethodField()
 
     def get_logo_data(self, instance):
         if (logo := instance.logo):
             return ImageSerializer(logo).data
-        return None
+
+    def get_ct_image_data(self, instance):
+        if (ct_image := instance.ct_image):
+            return ImageSerializer(ct_image).data

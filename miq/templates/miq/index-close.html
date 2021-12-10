@@ -1,8 +1,8 @@
 <div class="index-close">
-{% if close_template.html %}
+{% if close_template.html %} 
 
     <!-- TEMPLATE -->
-    {% include 'miq/components/section.html' with section=close_template %}
+    {{close_template.html|safe}}
     <!-- TEMPLATE END -->
 
 {% elif close_template.title %}
