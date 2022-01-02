@@ -5,11 +5,11 @@ from django.utils.text import Truncator
 from django.contrib.auth import get_user_model
 from django.utils.translation import gettext_lazy as _
 from django.template.defaultfilters import filesizeformat
-from django.template import Context, Template
-from django.template.loader import render_to_string
 
+from miq.mixins import RendererMixin
 from .mixins import BaseModelMixin
 
+from miq.utils import img_file_from_pil, get_file_ext
 from miq.utils_img import get_thumbnail, crop_img_to_square
 
 
@@ -17,7 +17,7 @@ User = get_user_model()
 
 
 def upload_to(instance, filename):
-    return f'images/{instance.user}/{filename}'
+    return f'images/{filename}'
 
 
 def upload_thumb_to(instance, filename):
@@ -46,27 +46,6 @@ class ImageManager(models.Manager):
 
     def get_queryset(self, *args, **kwargs):
         return ImageQeryset(self.model, *args, using=self._db, **kwargs)
-
-
-class RendererMixin:
-    def render_thumb_sq(self):
-        return self._render(
-            'miq/components/img-square.html',
-            context={'img': self, **self.to_json()}
-        )
-
-    def render(self):
-        return self._render(
-            'miq/components/img.html',
-            context={'img': self, **self.to_json()}
-        )
-
-    def _render(self, template_name: str, context: dict = {}):
-
-        if '.html' in template_name:
-            return render_to_string(template_name, context)
-
-        return Template(str(template_name)).render(Context(context))
 
 
 class Image(RendererMixin, BaseModelMixin):
@@ -122,25 +101,42 @@ class Image(RendererMixin, BaseModelMixin):
 
     def save(self, *args, **kwargs):
         if not self.pk:
-            self.src_mobile.save(
-                self.src.url.split('/')[-1],
-                self.src.file, save=False)
-            self.thumb.save(
-                self.src.url.split('/')[-1],
-                self.src.file, save=False)
-            self.thumb_sq.save(
-                self.src.url.split('/')[-1],
-                self.src.file, save=False)
+            thumb = img_file_from_pil(get_thumbnail(file=self.src))
+            filename = self.src.url.split('/')[-1]  # type: str
+            ext = get_file_ext(self.src.path)  # type: str
+            if isinstance(ext, str) and ext.startswith('.'):
+                ext = ext[1:]
+
+            self.src_mobile.save(filename, thumb, save=False)
+            self.thumb.save(filename, thumb, save=False)
+
+            thumb_sq = img_file_from_pil(crop_img_to_square(file=self.thumb))
+            self.thumb_sq.save(filename, thumb_sq, save=False)
+
+            # self.src_mobile.save(
+            #     self.src.url.split('/')[-1],
+            #     self.src.file, save=False)
+            # self.thumb.save(
+            #     self.src.url.split('/')[-1],
+            #     self.src.file, save=False)
+
+            # render = img_file_from_pil(crop_img_to_square(file=self.thumb))
+            # self.thumb_sq.save(
+            #     self.src.url.split('/')[-1],
+            #     # self.src.file,
+            #     render,
+            #     save=False)
+            # self.thumb_sq.save()
+            # crop_img_to_square(file=self.thumb).save(self.thumb_sq.path)
 
         super().save(*args, **kwargs)
 
-        if not self.pk:
-            try:
-                get_thumbnail(file=self.src_mobile).save(self.src_mobile.path)
-                get_thumbnail(file=self.thumb).save(self.thumb.path)
-                crop_img_to_square(file=self.thumb).save(self.thumb_sq.path)
-            except Exception:
-                pass
+        # if not self.pk:
+        #     try:
+        #         get_thumbnail(file=self.src_mobile).save(self.src_mobile.path)
+        #         get_thumbnail(file=self.thumb).save(self.thumb.path)
+        #     except Exception:
+        #         pass
 
     @property
     def name_truncated(self):
@@ -187,6 +183,11 @@ class Image(RendererMixin, BaseModelMixin):
             'alt_text': self.alt_text or '',
         }
 
+        if self.src_mobile:
+            data['src_mobile'] = f'{self.src_mobile.url}'
+            data['src_mobile_width'] = self.src_mobile.width
+            data['src_mobile_height'] = self.src_mobile.height
+
         if self.thumb:
             data['thumb'] = f'{self.thumb.url}'
             data['thumb_width'] = self.thumb.width
@@ -198,6 +199,18 @@ class Image(RendererMixin, BaseModelMixin):
             data['thumb_sq_height'] = self.thumb_sq.height
 
         return data
+
+    def render_thumb_sq(self):
+        return self._render(
+            'miq/components/img-square.html',
+            context={'img': self, **self.to_json()}
+        )
+
+    def render(self):
+        return self._render(
+            'miq/components/img.html',
+            context={'img': self, **self.to_json()}
+        )
 
     def deactivate(self):
         self.is_active = False

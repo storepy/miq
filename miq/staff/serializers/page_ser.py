@@ -4,11 +4,23 @@ from rest_framework import serializers
 
 from miq.models import Page
 from miq.mixins import ModelSerializerMixin
- 
-class PageSerializer(ModelSerializerMixin, serializers.ModelSerializer):
+
+
+class PageSerializerMixin(ModelSerializerMixin, serializers.ModelSerializer):
+    sections = serializers.SlugRelatedField(
+        slug_field="slug", read_only=True,
+        many=True,
+        # queryset=Section.objects.all(), required=False
+    )
+
+
+class PageSerializer(PageSerializerMixin):
     class Meta:
         model = Page
-        read_only_fields = ('slug','dt_published', 'sections', 'children', 'updated_since',)
+        read_only_fields = (
+            'slug', 'dt_published',
+            'sections', 'children', 'updated_since',
+        )
         fields = (
             # 'site',
             'slug_public', 'title', 'label', 'is_published',
@@ -20,13 +32,7 @@ class PageSerializer(ModelSerializerMixin, serializers.ModelSerializer):
     children = serializers.SlugRelatedField(
         slug_field="slug", read_only=True, many=True
     )
-    sections = serializers.SlugRelatedField(
-        slug_field="slug", read_only=True,
-        many=True,
-        # queryset=Section.objects.all(), required=False
-    )
 
     def create(self, validated_data):
-        validated_data.update({'site':get_current_site(self.get_request())})
+        validated_data.update({'site': get_current_site(self.get_request())})
         return super().create(validated_data)
-

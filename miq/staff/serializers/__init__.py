@@ -4,17 +4,17 @@ from django.urls import reverse_lazy
 
 from miq.models import SiteSetting
 from miq.auth.serializers import ImageSerializer
-from miq.auth.serializers import CloseTemplateSectionSerializer
 from miq.models.image_mod import Image
 from .index_ser import IndexSerializer
-from .page_ser import PageSerializer
+from .page_ser import PageSerializer, PageSerializerMixin
 from .user_ser import StaffUserSerializer
 from .image_ser import StaffImageSerializer
 
 
 __all__ = (
     'AdminSiteSerializer', 'AdminSiteSettingSerializer',
-    'StaffUserSerializer', 'IndexSerializer', 'PageSerializer',
+    'StaffUserSerializer', 'IndexSerializer',
+    'PageSerializerMixin', 'PageSerializer',
     'StaffImageSerializer'
 )
 

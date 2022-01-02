@@ -6,11 +6,13 @@ from .user_ser import StaffUserSerializer
 class StaffImageSerializer(ImageSerializer):
     class Meta(ImageSerializer.Meta):
         read_only_fields = (
-            'slug', 'name', 'name_truncated', 'height', 'width', 'size',
-            'user', 'created', 'updated',
+            'user', 'slug', 'name', 'name_truncated',
+            'height', 'width', 'size',
+            'height_mobile', 'width_mobile', 'size_mobile',
+            'created', 'updated',
         )
         fields = (
-            'src', 'thumb', 'thumb_sq',
+            'src', 'src_mobile', 'thumb', 'thumb_sq',
             'alt_text', 'caption', 'position',
             *read_only_fields
         )
