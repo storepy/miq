@@ -8,21 +8,20 @@ from .generic import ListView
 
 
 class IndexView(ListView):
-    object = None
     paginate_by = 50
+    object = None
     template_name = 'miq/page.html'
 
     def get_queryset(self):
-        site = get_current_site(self.request)
-        self.object = get_object_or_404(Index, site=site)
+        self.object = get_object_or_404(
+            Index, site=get_current_site(self.request))
         return Section.objects.order_by('position')\
             .filter(source=self.object.slug)
 
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
 
-        if (obj := self.object) is not None:
-            context['object'] = obj
-            context['title'] = obj.title
+        context['object'] = self.object
+        context['title'] = self.object.title
 
         return context

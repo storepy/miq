@@ -36,9 +36,6 @@ class TestImageViewset(Mixin, APITestCase):
         except Exception:
             pass
 
-    # def test_partial_update(self):
-    #     pass
-
     def test_create(self):
         # TODO: Require site slug on create
         self.assertTrue(self.is_logged_in)
@@ -48,8 +45,6 @@ class TestImageViewset(Mixin, APITestCase):
             format='multipart'
         )
         self.assertEqual(r.status_code, status.HTTP_201_CREATED)
-
-        print('Hey')
 
         slug = r.data.get('slug')
         image = Image.objects.get(slug=slug)
@@ -69,7 +64,6 @@ class TestImageViewset(Mixin, APITestCase):
     def test_user_not_auth(self):
         self.client.logout()
         r = self.client.get(list_path)
-        # self.assertNotEqual(r.status_code, 200)
 
         # Redirect
         self.assertEqual(r.status_code, status.HTTP_302_FOUND)

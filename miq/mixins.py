@@ -1,5 +1,7 @@
 from django.conf import settings
 from django.http import HttpResponse
+from django.template import Context, Template
+from django.template.loader import render_to_string
 from django.contrib.auth.mixins import LoginRequiredMixin
 
 
@@ -9,6 +11,15 @@ class ModelSerializerMixin:
             return self._kwargs.get('context').get('request')
         except Exception:
             return None
+
+
+class RendererMixin:
+    def _render(self, template_name: str, context: dict = {}):
+
+        if '.html' in template_name:
+            return render_to_string(template_name, context)
+
+        return Template(str(template_name)).render(Context(context))
 
 
 class DevLoginRequiredMixin(LoginRequiredMixin):

@@ -1,4 +1,10 @@
 
-<div class="miq-img">
-    <img src={{src}} alt={{alt_text}} class="miq-img"/>
-</div>
+<picture>
+    <source srcSet={{src}} media='(min-width: 768px)' />
+    <img
+        src="{% firstof src_mobile src %}"
+        alt="{{alt_text|default:''}}"
+        class="miq-img miq-img-picture"
+    />
+</picture>
+

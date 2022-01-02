@@ -18,7 +18,8 @@ setup(
     license='',
     packages=find_packages(),
     install_requires=[
-        "django>=2.2", 'djangorestframework', 'Pillow', 'django-environ',
+        "django>=2.2", 'djangorestframework',
+        'django-environ', 'requests', 'Pillow'
     ],
     extras_require={
         "dev": [

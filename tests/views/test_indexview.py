@@ -18,4 +18,3 @@ class TestIndexView(Mixin, TestCase):
     def test_context(self):
         r = self.client.get(path)
         self.assertEqual(r.context.get('title'), 'Welcome')
-        # print()

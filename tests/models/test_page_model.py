@@ -20,7 +20,7 @@ class TestPageModel(Mixin, TransactionTestCase):
         self.assertIsNotNone(self.site)
         page = Page.objects.create(site=self.site, label="label")
 
-        self.assertEqual(f'{page}', 'example.com label page')
+        self.assertEqual(f'{page}', 'label[example.com]')
         self.assertIsNone(page.detail_url)
 
         self.assertIsNone(page.dt_published)

@@ -16,6 +16,10 @@ __all__ = ['Index', 'Page', 'PageSectionMeta']
 
 
 class AbstractPage(BaseModelMixin):
+    """
+    Adds the following fields:
+    - title : CharField, max_length 250, null, blank
+    """
     class Meta:
         abstract = True
 
@@ -23,6 +27,9 @@ class AbstractPage(BaseModelMixin):
         max_length=250, help_text=_('Page Meta title'),
         null=True, blank=True
     )
+    # meta_title
+    # meta_description
+    # meta_keywords
 
     def update_sections_source(self):
         to_update = self.sections.exclude(source=self.slug)
@@ -30,7 +37,10 @@ class AbstractPage(BaseModelMixin):
             to_update.update(source=self.slug)
 
 
+"""
 # INDEX PAGE
+"""
+
 
 class IndexManager(models.Manager):
     def get_queryset(self, *args, **kwargs):
@@ -40,6 +50,12 @@ class IndexManager(models.Manager):
 
 
 class Index(AbstractPage):
+    """
+    Has the following fields:
+    - site: OneToOneField, cascades on delete
+    - title : CharField, max_length 250, null, blank
+    - sections: ManyToManyField, blank
+    """
     class Meta:
         ordering = ('-created', '-updated')
         verbose_name = _('Index page')
@@ -49,12 +65,15 @@ class Index(AbstractPage):
     site = models.OneToOneField(
         Site, on_delete=models.CASCADE,
         related_name='index')
-    sections = models.ManyToManyField('miq.Section', blank=True)
+    sections = models.ManyToManyField(
+        'miq.Section', blank=True, related_name='index')
 
     objects = IndexManager()
 
 
+"""
 # PAGE
+"""
 
 
 class PageQueryset(models.QuerySet):
@@ -87,6 +106,18 @@ class PageManager(models.Manager):
 
 
 class Page(AbstractPage):
+    """
+    Has the following fields:
+    - site: OneToOneField, CASCADE, related_name: pages
+    - title: CharField, max_length 250, null, blank
+    - label: CharField, max_length 100
+    - source: CharField, max_length 100, null, blank
+    - slug_public: SlugField, max_length 100, db_index, unique, default: uuid4
+    - parent: ForeignKey, CASCADE, related_name: children
+    - sections: ManyToManyField, blank, related_name: pages
+    - is_published: BooleanField, False
+    - dt_published: DateTimeField, blank, null
+    """
     # From Abstract:  title
     # From related: children
 
@@ -106,7 +137,7 @@ class Page(AbstractPage):
     )
 
     # MUST BE the same as related name
-    source = models.CharField(max_length=100, blank=True, null=True) 
+    source = models.CharField(max_length=100, blank=True, null=True)
 
     label = models.CharField(max_length=100, help_text=_('Page header label'))
 
@@ -137,7 +168,7 @@ class Page(AbstractPage):
             sections.update(source=self.slug)
 
     def __str__(self):
-        return f'{self.site.name}: {self.label or self.title} | {self.source} page'
+        return f'{self.label}[{self.site.name}]'
 
     class Meta:
         ordering = ('-created', '-updated')
@@ -171,7 +202,9 @@ class Page(AbstractPage):
         self.save()
 
 
+"""
 # PAGE SECTION META
+"""
 
 
 class PageSectionMeta(BaseModelMixin):
@@ -198,13 +231,3 @@ class PageSectionMeta(BaseModelMixin):
 
     def __str__(self):
         return f'{self.page}, section[{self.section}] {self.section.position}'
-
-
-# class PageSection(Section):
-#     class Meta(Section.Meta):
-#         proxy=True
-
-#     def save(self, *args, **kwargs):
-#         if self.pk:
-
-#         super().save(*args, **kwargs)

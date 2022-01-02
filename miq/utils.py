@@ -1,12 +1,67 @@
+import os
+import requests
+from io import BytesIO
+
 from django.apps import apps
-from django.urls.base import reverse_lazy
+from django.utils import timezone
+from django.core.files import File
+# from django.urls.base import reverse_lazy
 from django.utils.text import Truncator
 from django.contrib.auth import get_user_model
 from django.core.validators import validate_ipv46_address
 
 
+"""
+FILES & IMAGES
+"""
+
+
+def clean_img_url(url: str) -> str:
+    if url.startswith('//'):
+        url = f'http://{url[2:]}'
+    return url
+
+
+def download_img_from_url(url, request=requests):
+    url = clean_img_url(url)
+
+    res = request.get(url)
+    if res.status_code != 200:
+        return None
+
+    return res
+
+
+def img_file_from_response(response, filename=None, ext='.jpg'):
+    filename = filename or f'{timezone.now().timestamp()}{ext}'
+    return File(BytesIO(response.content), name=filename)
+
+
+def img_file_from_pil(pil_image, ext='png'):
+    if not ext or ext.lower() not in ['webp', 'jpeg', 'png']:
+        ext = 'png'
+
+    blob = BytesIO()
+    pil_image.save(blob, ext.upper())
+    return File(blob)
+
+
+def get_file_ext(path):
+    return os.path.splitext(path)[1]
+
+
+"""
+STRING
+"""
+
+
 def truncate_str(string: str, *, lenght: int = 80):
     return Truncator(string).chars(lenght)
+
+
+"""
+APPS CONFIG
+"""
 
 
 def serialize_app_config(app_config):
@@ -35,6 +90,11 @@ def get_serialized_app_configs_dict(exclude=None, exclude_django_apps=False):
     }
 
 
+"""
+TESTS
+"""
+
+
 def create_staffuser(username, password, **kwargs):
     """
     Creates a new user and sets is_staff to True
@@ -57,11 +117,31 @@ def get_user_perms_dict(user):
     return {'count': len(perms), 'perms': perms}
 
 
+"""
+MODELS
+"""
+
+
 def get_text_choices(TextChoiceModel):
     return [
         {'name': choice.name, 'label': choice.label, 'value': choice.value}
         for choice in TextChoiceModel
     ]
+
+
+"""
+HELPERS
+"""
+
+
+def get_dict_key(data: dict, key: str):
+    if '__' not in key:
+        return data.get(key)
+
+    value = {**data}
+    for key in key.split('__'):
+        value = value.get(key, {})
+    return value
 
 
 def get_ip(request):
