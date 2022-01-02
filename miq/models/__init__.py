@@ -24,7 +24,8 @@ __all__ = (
     'User', 'UserGender', 'UserGenders',
     'Image', 'Thumbnail', 'File',
     'Index', 'Page', 'PageSectionMeta',
-    'CloseTemplateSection',
+
+    'SiteSetting', 'SocialLink',
     # 'SectionType', 'Section', 'SectionImageMeta',
     # 'ImageSection', 'MarkdownSection', 'TextSection', 'JumbotronSection
 )
@@ -45,11 +46,6 @@ class SiteSetting(BaseModelMixin):
     is_live = models.BooleanField(
         default=False,
         help_text=_('Turn off to prevent access to your website'))
-
-    close_template = models.OneToOneField(
-        'miq.JumbotronSection',
-        blank=True, null=True, on_delete=models.SET_NULL,
-        help_text=_('This template appears when the site is not live'))
 
     # LOGO
 
@@ -80,9 +76,10 @@ class SiteSetting(BaseModelMixin):
         on_delete=models.SET_NULL, blank=True, null=True,
         related_name='site_setting')
 
-    # ct_url = models.URLField(
-    #     null=True, blank=True,
-    #     help_text=_('Call to action or link url'))
+    # SOCIAL LINKS
+
+    links = models.ManyToManyField(
+        'miq.SocialLink', verbose_name=_("Social links"), blank=True,)
 
     #
     # extra = models.JSONField(default=setting_extra, blank=True)
@@ -96,12 +93,6 @@ class SiteSetting(BaseModelMixin):
         return f'Settings: {self.site}'
 
     # def save(self, *args, **kwargs):
-    #     if not self.close_template:
-    #         self.add_close_template(
-    #             title='Please come back later!',
-    #             text='This site is currently under construction.'
-    #         )
-
     #     self.extra = {**setting_extra(), **self.extra}
     #     super().save(*args, **kwargs)
 
@@ -110,8 +101,23 @@ class SiteSetting(BaseModelMixin):
         if self.contact_email:
             return self.contact_email.replace('@', '[at]')
 
-    # def add_close_template(self, title, text):
-    #     from .section_proxies import JumbotronSection
 
-    #     self.close_template = JumbotronSection.objects.create(
-    #         title=title, text=text)
+"""
+# LINK
+"""
+
+
+class AbstractLink(BaseModelMixin):
+    class Meta:
+        ordering = ('name', '-created')
+        abstract = True
+
+    name = models.CharField(_("Display name"), max_length=50)
+    url = models.URLField(_("Url"), max_length=250)
+    is_external = models.BooleanField(_("Open in new tab"), default=False)
+
+
+class SocialLink(AbstractLink):
+    def save(self, *args, **kwargs) -> None:
+        self.is_external = True
+        return super().save(*args, **kwargs)

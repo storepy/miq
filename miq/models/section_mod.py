@@ -1,13 +1,15 @@
 
+from django.utils.safestring import mark_safe
 from django.db import models
 from django.contrib.sites.models import Site
 from django.utils.translation import gettext_lazy as _
 
+from miq.mixins import RendererMixin
 from .mixins import BaseModelMixin
 
 
 __all__ = (
-    'SectionType', 'Section', 'SectionImageMeta', 'CloseTemplateSection',
+    'SectionType', 'Section', 'SectionImageMeta',
     'ImageSection', 'MarkdownSection', 'TextSection', 'JumbotronSection'
 )
 
@@ -19,6 +21,9 @@ class SectionType(models.TextChoices):
 
     # Media Types
     IMG = 'IMG', _('Image')
+    HGAL = 'HGAL', _('Horizontal gallery')
+    VGAL = 'VGAL', _('Vertical gallery')
+    SQGRID = 'SQGRID', _('Square grid')
 
     # Mixed Types
     JUMB = 'JUMB', _('Jumbotron')
@@ -27,8 +32,11 @@ class SectionType(models.TextChoices):
     # Embed
     EMBED = 'EMBED', _('Embed')
 
-    # CLOSE TEMPLATE
-    CLOSE = 'CLOSE', _('Close Template')
+
+RENDERER_TEMPLATES = {
+    SectionType.HGAL: 'miq/components/img-gallery-horizontal.html',
+    SectionType.TXT: '',
+}
 
 
 class SectionAbstract(BaseModelMixin):
@@ -49,7 +57,7 @@ class SectionManager(models.Manager):
         return super().get_queryset().prefetch_related('images')
 
 
-class Section(SectionAbstract):
+class Section(RendererMixin, SectionAbstract):
 
     class Meta:
         verbose_name = _('Section')
@@ -91,6 +99,21 @@ class Section(SectionAbstract):
     def image(self):
         if self.images.exists():
             return self.images.order_by('position').first()
+
+    def render(self):
+        # DONOT USE: EXPERIMENTAL CODE
+
+        html = mark_safe(self.html)
+        try:
+            return self._render(
+                RENDERER_TEMPLATES.get(self.type, '<div></div>'),
+                context={
+                    'section': self, 'images': self.images.all,
+                    'type': self.type
+                }
+            )
+        except Exception:
+            return html
 
 
 class SectionImageMeta(SectionAbstract):
@@ -138,13 +161,4 @@ class TextSection(Section):
 
     def save(self, *args, **kwargs):
         self.type = SectionType.TXT
-        super().save(*args, **kwargs)
-
-
-class CloseTemplateSection(Section):
-    class Meta:
-        proxy = True
-
-    def save(self, *args, **kwargs):
-        self.type = SectionType.CLOSE
         super().save(*args, **kwargs)

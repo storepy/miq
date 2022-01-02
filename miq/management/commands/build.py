@@ -3,6 +3,7 @@ import subprocess
 from bs4 import BeautifulSoup
 
 from django.conf import settings
+from django.contrib.sites.models import Site
 from django.core.management import call_command
 from django.core.management.base import BaseCommand
 
@@ -14,6 +15,9 @@ class Command(BaseCommand):
     help = 'Collect React index.html and static files'
 
     def handle(self, *args, **kwargs):
+        # First build
+        if (site := Site.objects.first()) and not hasattr(site, 'settings'):
+            site.save()
 
         # print(settings.BUILD_DIR, '\n')
 

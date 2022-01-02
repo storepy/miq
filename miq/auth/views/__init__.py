@@ -1,25 +1,16 @@
 from django.apps import apps
 from django.contrib.auth import get_user_model
-from django.contrib.sites.shortcuts import get_current_site
+# from django.contrib.sites.shortcuts import get_current_site
 
 from rest_framework import viewsets, mixins
 from rest_framework.decorators import action
-from rest_framework.serializers import ValidationError
-from rest_framework.parsers import JSONParser, MultiPartParser
-
-from miq.models import Image
+from rest_framework.parsers import JSONParser
 
 from miq.mixins import DevLoginRequiredMixin
 
 from ..serializers import (
     # images
-    AccountSerializer, ImageSerializer, ImageSectionSerializer,
-
-    # files
-    FileSerializer,
-
-    # sections
-    SectionSerializer, TextSectionSerializer, MarkdownSectionSerializer,
+    AccountSerializer
 )
 
 User = get_user_model()
