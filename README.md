@@ -16,4 +16,6 @@ python -m pytest
 ```
 coverage run -m pytest
 coverage run -m pytest tests/auth/test_auth_image_viewset.py::TestImageViewset::test_create
+
+coverage html
 ```
