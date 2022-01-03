@@ -32,14 +32,16 @@ __all__ = (
 
 
 class SiteSetting(BaseModelMixin):
-
     site = models.OneToOneField(
         Site, on_delete=models.CASCADE,
         related_name='settings', default=1)
 
     # CONTACT
+    contact_number = models.CharField(
+        max_length=20, blank=True, null=True,
+        help_text=_('Preferred contact number'))
     contact_email = models.EmailField(
-        max_length=400, blank=True,
+        max_length=99, blank=True, null=True,
         help_text=_('Preferred contact email'))
     #
 

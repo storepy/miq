@@ -113,30 +113,7 @@ class Image(RendererMixin, BaseModelMixin):
             thumb_sq = img_file_from_pil(crop_img_to_square(file=self.thumb))
             self.thumb_sq.save(filename, thumb_sq, save=False)
 
-            # self.src_mobile.save(
-            #     self.src.url.split('/')[-1],
-            #     self.src.file, save=False)
-            # self.thumb.save(
-            #     self.src.url.split('/')[-1],
-            #     self.src.file, save=False)
-
-            # render = img_file_from_pil(crop_img_to_square(file=self.thumb))
-            # self.thumb_sq.save(
-            #     self.src.url.split('/')[-1],
-            #     # self.src.file,
-            #     render,
-            #     save=False)
-            # self.thumb_sq.save()
-            # crop_img_to_square(file=self.thumb).save(self.thumb_sq.path)
-
         super().save(*args, **kwargs)
-
-        # if not self.pk:
-        #     try:
-        #         get_thumbnail(file=self.src_mobile).save(self.src_mobile.path)
-        #         get_thumbnail(file=self.thumb).save(self.thumb.path)
-        #     except Exception:
-        #         pass
 
     @property
     def name_truncated(self):

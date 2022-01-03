@@ -46,7 +46,7 @@ class AdminSiteSettingSerializer(serializers.ModelSerializer):
         model = SiteSetting
         read_only_fields = ('slug', 'site', 'logo_data', 'ct_image_data')
         fields = (
-            'is_live', 'contact_email', 'logo',
+            'is_live', 'contact_email', 'contact_number', 'logo',
             'ga_tracking', 'fb_pixel',
             'ct_title', 'ct_text', 'ct_html', 'ct_image',
             *read_only_fields

@@ -65,6 +65,10 @@ class Index(AbstractPage):
     site = models.OneToOneField(
         Site, on_delete=models.CASCADE,
         related_name='index')
+    cover = models.OneToOneField(
+        'miq.Image', verbose_name=_("Cover"), on_delete=models.SET_NULL,
+        blank=True, null=True
+    )
     sections = models.ManyToManyField(
         'miq.Section', blank=True, related_name='index')
 
