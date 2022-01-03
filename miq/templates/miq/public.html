@@ -1,77 +1,64 @@
 {% extends 'base.html' %} {% load i18n %}
+{% load static %}
 
-<!-- prettier-ignore -->
-<style type="text/css">
-    {% block css %}
-    {% spaceless %}{{ block.super }}
-
-    #public-header .header-navbar{
-        display: flex;
-        position: sticky;
-        top: 0;
-        z-index: 100;
-        justify-content: center;
-    }
-
-    #public-header .header-logo{
-        font-weight: 900;
-        font-size:x-large;
-    }
-
-    {% endspaceless %}
-    {% endblock css %}
-</style>
 
 {% block meta %} {{ block.super }}
-<!-- prettier-ignore -->
 {% include "miq/meta.html" %} 
 {% endblock meta %} 
 
-{% block body %}
+<!-- prettier-ignore -->
+{% block css_links %}
+<link href="{% static "miq.css" %}?{% now "U" %}" rel="stylesheet">
+{% endblock css_links %}
+
+{% block pre_react %}
 
 <!-- prettier-ignore -->
 {% if is_live is False and request.path != '/login/' and not request.user.is_staff %}
 
-<!-- CLOSE -->
-{% include 'miq/index-close.html' %}
-<!-- CLOSE END -->
+<!-- CLOSE -->{% include 'miq/index-close.html' %}<!-- CLOSE END -->
 
 {% else %}
 <!-- OPEN -->
 <!-- prettier-ignore -->
 <div class="public">
+  <!-- HEADER -->
+  <header id="public-header">
+      {% block navbar %}
+          <div class="header-navbar"><a href="/" class="header-logo">{{site.name}}</a></div>
+      {% endblock navbar %}
 
-    <!-- HEADER -->
-    <header id="public-header">
-        {% block navbar %}
-            <div class="header-navbar">
-                <a href="/" class="header-logo">{{site.name}}</a>
-            </div>
-        {% endblock navbar %}
-        {% block header %}{% endblock header %}
-    </header>
-    <!-- HEADER END -->
+      {% block header %}{% endblock header %}
+  </header>
+  <!-- HEADER END -->
 
-    <!-- MAIN --><main id="public-main" role="main">{% block main %}{% endblock main %}</main><!-- MAIN END -->
-
-    <!-- JS -->
-    {{ block.super }}
-    <!-- JS END -->
-
-    <!-- FOOTER -->
-    <footer id="public-footer">{% block footer %}{% endblock footer %}</footer>
-    <!-- FOOTER END -->
+  <!-- MAIN --><main id="public-main" role="main">{% block main %}{% endblock main %}</main><!-- MAIN END -->
 </div>
 <!-- OPEN END -->
 <!-- prettier-ignore -->
 {% endif %}
 
-{% endblock body %}
+{% endblock pre_react %}
+
+
+{% block react %}
+<!-- JS -->
+{{ block.super }}
+<!-- JS END -->
+{% endblock react %}
+  
+
+{% block post_react %}
+<!-- FOOTER -->
+<footer id="public-footer">{% block footer %}{% endblock footer %}</footer>
+<!-- FOOTER END -->
+{% endblock post_react %}
+  
 
 <!-- prettier-ignore -->
 {% block head_scripts %}
 
 {% include "miq/ga-tracking-code.html" %}
 {% include "miq/fb-pixel-code.html" %}
-    
+  
 {% endblock head_scripts %}

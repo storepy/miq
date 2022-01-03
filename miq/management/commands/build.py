@@ -53,13 +53,18 @@ class Command(BaseCommand):
         soup.title.replace_with("{% block head %}{% endblock head %}")
 
         root = soup.find("div", id="root")
-        root.insert_before("{% block body %}")
-        root.insert_after("{% endblock body %}")
+        root.insert_before(
+            "{% block pre_react %}{% endblock pre_react %}{% block react %}")
+        root.insert_after(
+            "{% endblock react %}{% block post_react %}{% endblock post_react %}")
 
-        style = soup.new_tag('style', type="text/css")
+        style = soup.new_tag('style', type="text/css", id='page-css')
         style.string = "{% block css %}{% endblock css %}"
-
         soup.head.insert(len(soup.head.contents), style)
+
+        style = soup.find("style", id="page-css")
+
+        style.insert_before("{% block css_links %}{% endblock css_links %}")
 
         with open(output_path, 'w', encoding='utf-8') as file:
             file.write(str(soup))

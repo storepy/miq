@@ -1,0 +1,12 @@
+#public-header .header-navbar {
+  display: flex;
+  position: sticky;
+  top: 0;
+  z-index: 100;
+  justify-content: center;
+}
+
+#public-header .header-logo {
+  font-weight: 900;
+  font-size: x-large;
+}
