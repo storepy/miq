@@ -63,10 +63,14 @@ class SiteMiddleware(CurrentSiteMiddleware):
                 'text': settings.ct_text
             }
 
-            if settings.ga_tracking:
-                ctx['ga_tracking'] = settings.ga_tracking.strip()
-            if settings.fb_pixel:
-                ctx['fb_pixel'] = settings.fb_pixel.strip()
+            if link := settings.whatsapp_link:
+                ctx['whatsapp_link'] = link
+                ctx['whatsapp_link_title'] = settings.whatsapp_link_title or ''
+
+            if ga := settings.ga_tracking:
+                ctx['ga_tracking'] = ga.strip()
+            if fb := settings.fb_pixel:
+                ctx['fb_pixel'] = fb.strip()
 
         # SHARED DATA
 

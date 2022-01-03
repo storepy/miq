@@ -43,6 +43,13 @@ class SiteSetting(BaseModelMixin):
     contact_email = models.EmailField(
         max_length=99, blank=True, null=True,
         help_text=_('Preferred contact email'))
+
+    whatsapp_link = models.URLField(
+        _("Whatsapp link"), max_length=200,
+        null=True, blank=True)
+    whatsapp_link_title = models.CharField(
+        _("Whatsapp link description"), max_length=99,
+        null=True, blank=True)
     #
 
     is_live = models.BooleanField(
