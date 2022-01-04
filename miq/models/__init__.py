@@ -37,9 +37,17 @@ class SiteSetting(BaseModelMixin):
         related_name='settings', default=1)
 
     # CONTACT
+
     contact_number = models.CharField(
         max_length=20, blank=True, null=True,
         help_text=_('Preferred contact number'))
+    contact_number_display = models.CharField(
+        _("Contact number description"), max_length=99,
+        null=True, blank=True)
+    contact_number_title = models.CharField(
+        _("Contact number description"), max_length=99,
+        null=True, blank=True)
+
     contact_email = models.EmailField(
         max_length=99, blank=True, null=True,
         help_text=_('Preferred contact email'))
@@ -50,7 +58,8 @@ class SiteSetting(BaseModelMixin):
     whatsapp_link_title = models.CharField(
         _("Whatsapp link description"), max_length=99,
         null=True, blank=True)
-    #
+
+    # LIVE STATUS
 
     is_live = models.BooleanField(
         default=False,

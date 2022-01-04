@@ -63,6 +63,14 @@ class SiteMiddleware(CurrentSiteMiddleware):
                 'text': settings.ct_text
             }
 
+            if number := settings.contact_number:
+                ctx['contact_number'] = number
+                ctx['contact_number_display'] = settings.contact_number_display or number
+                ctx['contact_number_title'] = settings.contact_number_title or ''
+
+            if email := settings.contact_email:
+                ctx['contact_email'] = email
+
             if link := settings.whatsapp_link:
                 ctx['whatsapp_link'] = link
                 ctx['whatsapp_link_title'] = settings.whatsapp_link_title or ''

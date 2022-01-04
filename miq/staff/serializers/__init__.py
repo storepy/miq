@@ -47,7 +47,7 @@ class AdminSiteSettingSerializer(serializers.ModelSerializer):
         read_only_fields = ('slug', 'site', 'logo_data', 'ct_image_data')
         fields = (
             'is_live', 'logo',
-            'contact_number', 'contact_email',
+            'contact_number', 'contact_number_title', 'contact_number_display', 'contact_email',
             'whatsapp_link', 'whatsapp_link_title',
             'ga_tracking', 'fb_pixel',
             'ct_title', 'ct_text', 'ct_html', 'ct_image',
@@ -56,10 +56,10 @@ class AdminSiteSettingSerializer(serializers.ModelSerializer):
 
     site = AdminSiteSerializer(required=False)
     logo = serializers.SlugRelatedField(
-        slug_field="slug", queryset=Image.objects.active(),  required=False,)
+        slug_field="slug", queryset=Image.objects.active(), required=False,)
     logo_data = serializers.SerializerMethodField()
     ct_image = serializers.SlugRelatedField(
-        slug_field="slug", queryset=Image.objects.active(),  required=False,)
+        slug_field="slug", queryset=Image.objects.active(), required=False,)
     ct_image_data = serializers.SerializerMethodField()
 
     def get_logo_data(self, instance):
