@@ -5,13 +5,14 @@ from miq.models import Image
 
 
 def serialize_context_pagination(request, context):
-    is_paginated = context.get('is_paginated')
-    page_obj = context.get('page_obj')
-    paginator = context.get('paginator')
+    is_paginated = context.get('is_paginated', False)
 
     data = {'is_paginated': is_paginated}
     if is_paginated:
+        page_obj = context.get('page_obj')
+        paginator = context.get('paginator')
         query_dict = request.GET.copy()
+
         _data = {
             'has_next': False,
             'has_previous': False,
