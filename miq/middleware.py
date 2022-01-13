@@ -116,13 +116,14 @@ class CORSMiddleware(object):
         self.process_response(response)
 
         # from pprint import pprint
-        # pprint(request.headers.__dict__)
+        # print(request.headers.__dict__)
 
         return response
 
     def process_response(self, response):
-        response["Access-Control-Allow-Origin"] = settings.CORS_ORIGIN
-        response["Access-Control-Allow-Headers"] = "X-CSRFTOKEN, x-requested-with, Content-Type, Accept, Origin"
-        response["Access-Control-Allow-Methods"] = "OPTIONS, GET, POST, PUT, DELETE, PATCH"
-        response["Access-Control-Max-Age"] = 86400
-        response["Access-Control-Allow-Credentials"] = 'true'
+        if origin := settings.CORS_ORIGIN:
+            response["Access-Control-Allow-Origin"] = origin
+            response["Access-Control-Allow-Headers"] = "X-CSRFTOKEN, x-requested-with, Content-Type, Accept, Origin"
+            response["Access-Control-Allow-Methods"] = "OPTIONS, GET, POST, PUT, DELETE, PATCH"
+            response["Access-Control-Max-Age"] = 86400
+            response["Access-Control-Allow-Credentials"] = 'true'
