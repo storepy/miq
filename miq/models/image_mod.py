@@ -1,3 +1,5 @@
+from django.db.models.functions import Concat
+from django.db.models import CharField, Value
 from django.db import models
 from django.contrib.sites.models import Site
 
@@ -37,6 +39,16 @@ class ImageQeryset(models.QuerySet):
 
 
 class ImageManager(models.Manager):
+
+    def update_alt_texts(self, value: str, *, with_position=True):
+        if not isinstance(value, str):
+            return self
+
+        if not with_position:
+            return self.update(alt_text=value)
+
+        alt_text = Concat(Value(f'{value} '), 'position', output_field=CharField())
+        return super().update(alt_text=alt_text)
 
     def user(self, user):
         return self.get_queryset().active().user(user)
@@ -92,7 +104,7 @@ class Image(RendererMixin, BaseModelMixin):
     objects = ImageManager()
 
     class Meta:
-        ordering = ('-updated', '-created', 'position')
+        ordering = ('position', '-updated', '-created')
         verbose_name = _('Image')
         verbose_name_plural = _('Images')
 
