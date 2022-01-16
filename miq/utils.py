@@ -16,6 +16,17 @@ FILES & IMAGES
 """
 
 
+def get_image_files_path(instance):
+    paths = [instance.src.path]
+    if(field := instance.src_mobile):
+        paths.append(field.path)
+    if(field := instance.thumb_sq):
+        paths.append(field.path)
+    if(field := instance.thumb):
+        paths.append(field.path)
+    return paths
+
+
 def clean_img_url(url: str) -> str:
     if url.startswith('//'):
         url = f'http://{url[2:]}'

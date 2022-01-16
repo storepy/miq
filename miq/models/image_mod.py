@@ -1,3 +1,5 @@
+import os
+
 from django.db.models.functions import Concat
 from django.db.models import CharField, Value
 from django.db import models
@@ -11,7 +13,7 @@ from django.template.defaultfilters import filesizeformat
 from miq.mixins import RendererMixin
 from .mixins import BaseModelMixin
 
-from miq.utils import img_file_from_pil, get_file_ext
+from miq.utils import get_image_files_path, img_file_from_pil, get_file_ext
 from miq.utils_img import get_thumbnail, crop_img_to_square
 
 
@@ -36,6 +38,20 @@ class ImageQeryset(models.QuerySet):
 
     def active(self):
         return self.filter(is_active=True)
+
+    def delete(self, *args, **kwargs):
+        paths = []
+        if self.exists():
+            for img in self:
+                paths.extend(get_image_files_path(img))
+
+        r = super().delete(*args, **kwargs)
+
+        if paths:
+            for path in paths:
+                if os.path.exists(path):
+                    os.remove(path)
+        return r
 
 
 class ImageManager(models.Manager):
@@ -78,7 +94,7 @@ class Image(RendererMixin, BaseModelMixin):
         max_length=500,
         verbose_name="Source mobile",
         help_text="Select an image file",
-        upload_to=upload_to,
+        upload_to=upload_thumb_to,
         null=True, blank=True)
 
     thumb_sq = models.ImageField(
@@ -93,8 +109,6 @@ class Image(RendererMixin, BaseModelMixin):
         help_text="Select an image file",
         upload_to=upload_thumb_to,
         null=True, blank=True)
-    # thumbnails = models.ManyToManyField(
-    #     "miq.Thumbnail", verbose_name=_("Thumbnails"), blank=True)
 
     caption = models.CharField(max_length=400, blank=True)
     alt_text = models.CharField(max_length=400, blank=True)
@@ -113,17 +127,17 @@ class Image(RendererMixin, BaseModelMixin):
 
     def save(self, *args, **kwargs):
         if not self.pk:
-            thumb = img_file_from_pil(get_thumbnail(file=self.src))
             filename = self.src.url.split('/')[-1]  # type: str
             ext = get_file_ext(self.src.path)  # type: str
             if isinstance(ext, str) and ext.startswith('.'):
                 ext = ext[1:]
 
+            thumb = img_file_from_pil(get_thumbnail(file=self.src))
             self.src_mobile.save(filename, thumb, save=False)
             self.thumb.save(filename, thumb, save=False)
 
-            thumb_sq = img_file_from_pil(crop_img_to_square(file=self.thumb))
-            self.thumb_sq.save(filename, thumb_sq, save=False)
+            crop = crop_img_to_square(file=self.thumb)
+            self.thumb_sq.save(filename, img_file_from_pil(crop), save=False)
 
         super().save(*args, **kwargs)
 
