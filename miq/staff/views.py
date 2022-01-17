@@ -20,7 +20,7 @@ ADMIN VIEW
 
 class AdminViewMixin(StaffLoginRequired):
 
-    template_name = 'miq/staff/base.html'
+    template_name = 'miq/staff/staff-base.django.html'
 
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
@@ -67,7 +67,7 @@ LOGIN
 
 class StaffLoginView(LoginView):
     authentication_form = StaffAuthForm
-    template_name = 'miq/staff/login.html'
+    template_name = 'miq/staff/login.django.html'
 
     def get_redirect_url(self):
         return reverse_lazy('staff:index')

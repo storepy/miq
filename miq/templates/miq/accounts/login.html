@@ -1,6 +1,5 @@
-<!-- prettier-ignore -->
 
-{% extends 'public.html' %} 
+{% extends 'public.django.html' %} 
 {% load i18n %}
 
 {% block main %}
@@ -68,8 +67,6 @@
 </div>
 
 {% endblock main %}
-
-<!-- prettier-ignore -->
 
 {% comment %} {% url 'accounts:register' %} {% endcomment %} 
 {% comment %} {% url 'accounts:password_reset' %} {% endcomment %}

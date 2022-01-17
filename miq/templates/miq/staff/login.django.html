@@ -1,6 +1,5 @@
-<!-- prettier-ignore -->
+{% extends 'miq/staff/staff-base.django.html' %}
 
-{% extends 'miq/staff/base.html' %}
 {% load i18n %}
 
 <style>
@@ -25,7 +24,7 @@
     {% endblock css %}
 </style>
 
-{% block body %}
+{% block pre_react %}
 
 <div class="staff-signin-container ">
     <div class="content flex-1">
@@ -80,8 +79,10 @@
     </div>
 </div>
 
-{% endblock body %}
+{% endblock pre_react %}
 
-<!-- prettier-ignore -->
+
+{% block react %}{% endblock react %}
+    
 
 {% comment %} {% url 'accounts:password_reset' %} {% endcomment %}
