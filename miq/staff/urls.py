@@ -1,15 +1,31 @@
 
-from django.urls import path, re_path
+from django.conf import settings
+from django.urls import path, re_path, include
 
-from .views import StaffLoginView, AdminView
+from rest_framework import routers
+
+from . import views
+from . import viewsets
 
 
 app_name = 'staff'
 
+staff_router = routers.DefaultRouter()
+
+staff_router.register(r'search-staff', viewsets.SearchView)
+
+staff_router.register(r'pages', viewsets.PageViewset)
+staff_router.register(r'index', viewsets.IndexViewset)
+staff_router.register(r'staffimages', viewsets.ImageViewset, 'staffimage')
+staff_router.register(r'settings', viewsets.SiteSettingViewset)
+
 
 urlpatterns = [
-    path('login/', StaffLoginView.as_view(), name='login'),
+    # API
+    path(f'{settings.API_PATH}/', include(staff_router.urls)),
+
+    path(f'{app_name}/login/', views.LoginView.as_view(), name='login'),
 
     # Catch-all url
-    re_path(r'', AdminView.as_view(), name='index'),
+    re_path(r'staff/', views.IndexView.as_view(), name='index'),
 ]

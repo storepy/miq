@@ -3,19 +3,10 @@ from django.contrib.sites.shortcuts import get_current_site
 
 from rest_framework import serializers
 
-from miq.models import Page
-from miq.mixins import ModelSerializerMixin
+from miq.core.models import Page
 
 
-class PageSerializerMixin(ModelSerializerMixin, serializers.ModelSerializer):
-    sections = serializers.SlugRelatedField(
-        slug_field="slug", read_only=True,
-        many=True,
-        # queryset=Section.objects.all(), required=False
-    )
-
-
-class PageSerializer(PageSerializerMixin):
+class PageSerializer(serializers.ModelSerializer):
     class Meta:
         model = Page
         read_only_fields = (
@@ -33,6 +24,11 @@ class PageSerializer(PageSerializerMixin):
     children = serializers.SlugRelatedField(
         slug_field="slug", read_only=True, many=True
     )
+    sections = serializers.SlugRelatedField(
+        slug_field="slug", read_only=True,
+        many=True,
+        # queryset=Section.objects.all(), required=False
+    )
 
     def validate_slug_public(self, value: str) -> str:
         return slugify(value)
@@ -40,3 +36,9 @@ class PageSerializer(PageSerializerMixin):
     def create(self, validated_data):
         validated_data.update({'site': get_current_site(self.get_request())})
         return super().create(validated_data)
+
+    def get_request(self):
+        try:
+            return self._kwargs.get('context').get('request')
+        except Exception:
+            return None

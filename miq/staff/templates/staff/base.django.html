@@ -1,0 +1,48 @@
+{% extends 'base.django.html' %}
+{% load i18n %} 
+{% load static %}
+
+{% block meta %}
+<meta name="description" content="This is MarQetIntl" />
+{% endblock meta %}
+
+{% block css_links %}{{ block.super }}
+  <link href="{% static "staff.css" %}" rel="stylesheet">
+{% endblock css_links %}
+
+{% block body %}
+{% spaceless %}{{ block.super }}{% endspaceless %}
+{% endblock body %}
+
+
+{% block head_scripts %}{{ block.super }}
+
+{% if fb_app_id %}
+
+<!-- FBAPP -->
+<script>
+  window.fbAsyncInit = function () {
+    FB.init({
+      appId: '{{fb_app_id}}',
+      cookie: true,
+      xfbml: true,
+      version: 'v12.0',
+    });
+
+    FB.AppEvents.logPageView();
+  };
+
+  (function (d, s, id) {
+    var js,
+      fjs = d.getElementsByTagName(s)[0];
+    if (d.getElementById(id)) {
+      return;
+    }
+    js = d.createElement(s);
+    js.id = id;
+    js.src = 'https://connect.facebook.net/en_US/sdk.js';
+    fjs.parentNode.insertBefore(js, fjs);
+  })(document, 'script', 'facebook-jssdk');
+</script>
+<!-- FBAPP -->
+{% endif %} {% endblock head_scripts %}

@@ -1,14 +1,18 @@
 
-from miq.auth.serializers import ImageSerializer
-from .user_ser import StaffUserSerializer
+from rest_framework import serializers
+
+from miq.core.models import Image
 
 
-class StaffImageSerializer(ImageSerializer):
-    class Meta(ImageSerializer.Meta):
+class ImageSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = Image
         read_only_fields = (
             'user', 'slug', 'name', 'name_truncated',
             'height', 'width', 'size',
             'height_mobile', 'width_mobile', 'size_mobile',
+            'height_thumb', 'width_thumb', 'size_thumb',
+            'height_thumb_sq', 'width_thumb_sq', 'size_thumb_sq',
             'created', 'updated',
         )
         fields = (
@@ -17,4 +21,4 @@ class StaffImageSerializer(ImageSerializer):
             *read_only_fields
         )
 
-    user = StaffUserSerializer(required=False)
+    user = serializers.SlugRelatedField(slug_field="slug", read_only=True)
