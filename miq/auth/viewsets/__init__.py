@@ -7,7 +7,7 @@ from django.utils.translation import gettext_lazy as _
 from django.contrib.sites.shortcuts import get_current_site
 
 
-from rest_framework import viewsets, status
+from rest_framework import viewsets, status, serializers
 from rest_framework.response import Response
 from rest_framework.serializers import ValidationError
 from rest_framework.parsers import JSONParser, MultiPartParser
@@ -29,7 +29,6 @@ from ..serializers import (
     SectionSerializer,
     get_section_serializer
 )
-from miq.auth import serializers
 
 User = get_user_model()
 
@@ -43,7 +42,7 @@ class ImageViewset(DevLoginRequiredMixin, viewsets.ModelViewSet):
     lookup_field = 'slug'
     serializer_class = ImageSerializer
     queryset = Image.objects.none()
-    parser_classes = (JSONParser,  MultiPartParser)
+    parser_classes = (JSONParser, MultiPartParser)
 
     def create(self, request, *args, **kwargs):
 
@@ -91,34 +90,7 @@ SECTION
 """
 
 
-class SectionViewset(DevLoginRequiredMixin, viewsets.ModelViewSet):
-    lookup_field = 'slug'
-    serializer_class = SectionSerializer
-    queryset = Section.objects.all()
-    parser_classes = (JSONParser, )
-
-    def get_queryset(self, *args, **kwargs):
-        params = self.request.query_params
-
-        if self.action == 'list':
-            source = params.get('source')
-            if not source or source == '':
-                return Section.objects.none()
-
-            source_type = params.get('source_type')
-            if source_type == 'index':
-                return Section.objects.filter(index__slug__in=[source])
-
-            if source_type == 'page':
-                return Section.objects.filter(pages__slug__in=[source])
-
-            if source_type == 'post':
-                return Section.objects.filter(posts__slug__in=[source])
-
-            return Section.objects.filter(source=source)
-
-        return super().get_queryset(*args, **kwargs)
-
+class SectionViewsetMixin:
     def get_serializer_class(self):
         if self.action == 'update' or self.action == 'partial_update':
             type = self.request.data.get('type')
@@ -134,6 +106,35 @@ class SectionViewset(DevLoginRequiredMixin, viewsets.ModelViewSet):
         serializer.save(site=get_current_site(self.request))
 
 
+class SectionViewset(DevLoginRequiredMixin, SectionViewsetMixin, viewsets.ModelViewSet):
+    lookup_field = 'slug'
+    serializer_class = SectionSerializer
+    queryset = Section.objects.all()
+    parser_classes = (JSONParser, )
+
+    def get_queryset(self, *args, **kwargs):
+        # params = self.request.query_params
+
+        # if self.action == 'list':
+        #     source = params.get('source')
+        #     if not source or source == '':
+        #         return Section.objects.none()
+
+        #     source_type = params.get('source_type')
+        #     if source_type == 'index':
+        #         return Section.objects.filter(index__slug__in=[source])
+
+        #     if source_type == 'page':
+        #         return Section.objects.filter(pages__slug__in=[source])
+
+        #     if source_type == 'post':
+        #         return Section.objects.filter(posts__slug__in=[source])
+
+        #     return Section.objects.filter(source=source)
+
+        return super().get_queryset(*args, **kwargs)
+
+
 """
 # FILE
 """
@@ -143,7 +144,7 @@ class FileViewset(DevLoginRequiredMixin, viewsets.ModelViewSet):
     lookup_field = 'slug'
     serializer_class = FileSerializer
     queryset = File.objects.all()
-    parser_classes = (JSONParser,  MultiPartParser)
+    parser_classes = (JSONParser, MultiPartParser)
 
     def perform_create(self, ser):
         ser.save(site=get_current_site(
