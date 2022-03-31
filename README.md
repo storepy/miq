@@ -20,6 +20,17 @@ coverage run -m pytest tests/auth/test_auth_image_viewset.py::TestImageViewset::
 coverage html
 ```
 
+install extra requires
+
+```
+pip3 install -e .\[extra\]
+```
+
+## Required template files:
+
+- base.django.html
+- public.django.html
+
 ### Base Public layout
 
 ```html

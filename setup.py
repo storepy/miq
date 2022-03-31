@@ -18,12 +18,12 @@ setup(
     license='',
     packages=find_packages(),
     install_requires=[
-        "django>=2.2", 'djangorestframework',
-        'django-environ', 'requests', 'Pillow'
+        "django>=4.0.1", 'djangorestframework', 'gunicorn', 'psycopg2-binary',
+        'django-environ', 'requests', 'Pillow', 'beautifulsoup4'
     ],
     extras_require={
         "dev": [
-            'coverage', 'selenium',
+            'coverage', 'flake8', 'autopep8', 'selenium',
             'pytest', 'pytest-cov', 'pytest-django',
         ]
     },
