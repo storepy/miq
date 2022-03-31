@@ -1,0 +1,16 @@
+<div class="imgs-gallery-horizontal">
+  <div class="imgs-gallery-horizontal-inner">
+    {% for image in images %}
+    <div class="gallery-item">
+      <picture>
+        <source srcset="{{image.src.url}}" media="(min-width: 768px)" />
+        <img
+          src="{% firstof image.src_mobile.url image.src.url %}"
+          alt="{{image.alt_text}}"
+          class="miq-img miq-img-picture"
+        />
+      </picture>
+    </div>
+    {% endfor %}
+  </div>
+</div>

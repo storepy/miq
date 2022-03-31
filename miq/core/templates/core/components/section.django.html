@@ -1,0 +1,23 @@
+{% if 'img' in section.type.lower %}
+  {% if section.image %}
+  {% for img in section.images.all %}
+    <div class="my-1 text-center">
+      <img
+      src="{{img.src.url}}"
+      alt="{{img.alt_text}}"
+      class="img-fluid"
+      width="{% firstof img.src.width%}"
+      height="{% firstof img.src.height%}"
+      />
+    </div>
+  {% endfor %}
+  {% endif %} 
+{% else %} 
+  {% if section.html %}
+    {% if section.type == 'CODE' %}
+      <pre>{{ section.html | safe }}</pre>
+    {% else %} 
+      {{ section.html | safe }} 
+    {% endif %} 
+  {% endif %} 
+{% endif %}

@@ -1,0 +1,4 @@
+<picture>
+  <source srcset="{{src}}" media="(min-width: 768px)" />
+  <img src="{% firstof src_mobile src %}" alt="{{alt_text|default:''}}" class="miq-img miq-img-picture" />
+</picture>

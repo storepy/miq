@@ -1,0 +1,17 @@
+<div class="index-close">
+{% if close_template.html %} 
+
+    <!-- TEMPLATE -->
+    {{close_template.html|safe}}
+    <!-- TEMPLATE END -->
+
+{% elif close_template.title %}
+
+    <p class="index-close-text">{{close_template.text}}</p>
+
+{% else %}
+    <h1 class="index-close-title">This site is currently under construction.</h1>
+    <h3 class="index-close-subtitle">Please come back later!</h3>
+{% endif %}
+
+</div> 
