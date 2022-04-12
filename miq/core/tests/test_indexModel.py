@@ -1,10 +1,9 @@
 
-from django.contrib.sites.models import Site
 
 from django.test import TransactionTestCase
 
+from miq.core.models import Index
 
-from miq.models import Index
 from miq.tests.mixins import TestMixin
 
 
@@ -12,7 +11,7 @@ class Mixin(TestMixin):
     pass
 
 
-class TestIndexModel(Mixin, TransactionTestCase):
+class TestCoreIndexModel(Mixin, TransactionTestCase):
     def setUp(self) -> None:
         super().setUp()
         # Must save

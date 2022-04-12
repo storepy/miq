@@ -3,7 +3,7 @@ from django.urls import reverse_lazy
 from rest_framework import status
 from rest_framework.test import APITestCase
 
-from miq.models import Page, Section
+from miq.core.models import Page, Section
 
 from miq.tests.mixins import TestMixin
 

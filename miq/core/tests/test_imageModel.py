@@ -2,9 +2,9 @@ import shutil
 from django.test import override_settings
 from django.test import TransactionTestCase
 
-from miq.tests.mixins import TestMixin
+from miq.core.models import Image
 
-from miq.models import Image
+from miq.tests.mixins import TestMixin
 from miq.tests.utils import get_temp_img
 
 TEST_MEDIA_DIR = 'test_media'
@@ -20,7 +20,7 @@ class Mixin(TestMixin):
 
 
 @override_settings(MEDIA_ROOT=(TEST_MEDIA_DIR))
-class TestImageModel(Mixin, TransactionTestCase):
+class TestCoreImageModel(Mixin, TransactionTestCase):
     def setUp(self) -> None:
         super().setUp()
         self.get_user()

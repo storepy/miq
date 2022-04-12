@@ -1,7 +1,7 @@
 from django.test import TransactionTestCase
 
 from miq.tests.mixins import TestMixin
-from miq.models import Section, TextSection, MarkdownSection, ImageSection
+from miq.core.models import Section, TextSection, MarkdownSection, ImageSection
 
 
 class Mixin(TestMixin):

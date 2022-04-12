@@ -10,7 +10,7 @@ class Mixin(TestMixin):
     pass
 
 
-class TestIndexView(Mixin, TestCase):
+class TestCoreIndexView(Mixin, TestCase):
     def setUp(self) -> None:
         super().setUp()
         self.site.save()

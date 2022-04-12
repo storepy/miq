@@ -4,7 +4,7 @@ from django.test import TransactionTestCase
 from miq.tests.mixins import UserMixin
 
 
-class TestPage(UserMixin, TransactionTestCase):
+class TestCoreUser(UserMixin, TransactionTestCase):
     def setUp(self) -> None:
         super().setUp()
 

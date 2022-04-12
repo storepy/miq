@@ -8,7 +8,6 @@ User = get_user_model()
 
 
 class UserMixin:
-
     username = 'usr'
     password = 'pwd'
     user = None
@@ -67,6 +66,14 @@ class SiteMixin:
     @property
     def site(self):
         return Site.objects.first()
+
+    def set_live(self, *, is_live: bool = True):
+        from miq.core.models import SiteSetting
+        setting = SiteSetting.objects.get(site=self.site)  # type: SiteSetting
+        setting.is_live = is_live
+        setting.save()
+
+        return setting
 
     def create_site(self):
         return Site.objects.create()

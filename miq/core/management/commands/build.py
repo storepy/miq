@@ -7,7 +7,7 @@ from django.contrib.sites.models import Site
 from django.core.management import call_command
 from django.core.management.base import BaseCommand
 
-index_path = os.path.join(settings.BUILD_DIR, 'index.html')
+
 output_path = os.path.join(settings.TEMPLATES_DIR, 'base-react.html')
 
 
@@ -41,10 +41,12 @@ class Command(BaseCommand):
             clear=True, verbosity=0
         )
 
-        exists = os.path.exists(index_path)
-        if not exists:
+        #
+
+        index_path = os.path.join(settings.BUILD_DIR, 'index.html')
+        if not os.path.exists(index_path):
             # print or raise error
-            self.stdout.write(self.style.ERROR(f'No index path'))
+            self.stdout.write(self.style.ERROR('No index path'))
             return
 
         html = open(index_path).read()

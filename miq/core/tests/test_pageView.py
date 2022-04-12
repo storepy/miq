@@ -1,7 +1,7 @@
 from django.test import TestCase
 from django.urls import reverse_lazy
 
-from miq.models import Page
+from miq.core.models import Page
 from miq.tests.mixins import TestMixin
 
 
@@ -10,7 +10,7 @@ class Mixin(TestMixin):
         return reverse_lazy('miq:page', args=[slug])
 
 
-class TestPageView(Mixin, TestCase):
+class TestCorePageView(Mixin, TestCase):
     def setUp(self) -> None:
         super().setUp()
 

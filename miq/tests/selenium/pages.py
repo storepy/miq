@@ -4,11 +4,13 @@ from selenium.webdriver.common.by import By
 
 class BasePage(object):
     driver = None
+    domain = None
 
-    def __init__(self, driver, *args, **kwargs):
+    def __init__(self, driver, *, domain=None, **kwargs):
         if (not driver):
             raise Exception('Driver required')
         self.driver = driver
+        self.domain = domain
 
     def find_by_text(self, txt):
         return self.driver.find_element(By.LINK_TEXT, txt)
