@@ -127,9 +127,14 @@ class Image(RendererMixin, BaseModelMixin):
         return f'{self.src}'
 
     def save(self, *args, **kwargs):
-        if not self.pk:
+
+        if not hasattr(self, 'site') and local and local.site:
             self.site = local.site
+
+        if not hasattr(self, 'user') and local and local.user:
             self.user = local.user
+
+        if not self.pk:
             filename = self.src.url.split('/')[-1]  # type: str
             ext = get_file_ext(self.src.path)  # type: str
             if isinstance(ext, str) and ext.startswith('.'):
