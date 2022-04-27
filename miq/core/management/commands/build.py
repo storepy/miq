@@ -26,7 +26,7 @@ class Command(BaseCommand):
 
         client_dir = getattr(settings, 'CLIENT_DIR', 'client')
         if not os.path.isdir(client_dir):
-            self.stdout.write(self.style.ERROR(f'No client directory found'))
+            self.stdout.write(self.style.ERROR('No client directory found'))
             return
 
         self.stdout.write('Building client app ...')
@@ -35,6 +35,12 @@ class Command(BaseCommand):
         if not os.path.isdir(settings.BUILD_DIR):
             raise Exception('No build directory')
 
+        index_path = os.path.join(settings.BUILD_DIR, 'index.html')
+        if not os.path.exists(index_path):
+            # print or raise error
+            self.stdout.write(self.style.ERROR('No index path'))
+            raise Exception('No index path')
+
         self.stdout.write('Collecting static files ...')
         call_command(
             'collectstatic', interactive=False,
@@ -42,12 +48,6 @@ class Command(BaseCommand):
         )
 
         #
-
-        index_path = os.path.join(settings.BUILD_DIR, 'index.html')
-        if not os.path.exists(index_path):
-            # print or raise error
-            self.stdout.write(self.style.ERROR('No index path'))
-            return
 
         html = open(index_path).read()
         soup = BeautifulSoup(html, 'html.parser')
