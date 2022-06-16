@@ -132,7 +132,9 @@ class Image(RendererMixin, BaseModelMixin):
             self.site = local.site
 
         if not hasattr(self, 'user') and local and local.user:
-            self.user = local.user
+            user = local.user
+            if user.is_authenticated:
+                self.user = user
 
         if not self.pk:
             filename = self.src.url.split('/')[-1]  # type: str
