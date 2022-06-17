@@ -32,6 +32,9 @@ class SiteSetting(BaseModelMixin):
         max_length=99, blank=True, null=True,
         help_text=_('Preferred contact email'))
 
+    whatsapp_number = models.CharField(
+        max_length=20, blank=True, null=True,
+        help_text=_('International Whatsapp number'))
     whatsapp_link = models.URLField(
         _("Whatsapp link"), max_length=200,
         null=True, blank=True)

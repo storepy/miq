@@ -81,15 +81,28 @@ class SiteMiddleware(CurrentSiteMiddleware):
                 ctx['contact_number_display'] = settings.contact_number_display or number
                 ctx['contact_number_title'] = settings.contact_number_title or ''
 
+                sD['contact_number'] = number
+                sD['contact_number_display'] = settings.contact_number_display or number
+                sD['contact_number_title'] = settings.contact_number_title or ''
+
             if email := settings.contact_email:
                 ctx['contact_email'] = email
 
-            if link := settings.whatsapp_link:
+            if number := settings.whatsapp_number:
+                title = settings.whatsapp_link_title or ''
+                link = settings.whatsapp_link or ''
+
+                ctx['whatsapp_number'] = number
                 ctx['whatsapp_link'] = link
-                ctx['whatsapp_link_title'] = settings.whatsapp_link_title or ''
+                ctx['whatsapp_link_title'] = title
+
+                sD['whatsapp_number'] = number
+                sD['whatsapp_link'] = link
+                sD['whatsapp_link_title'] = title
 
             if ga := settings.ga_tracking:
                 ctx['ga_tracking'] = ga.strip()
+
             if fb := settings.fb_pixel:
                 ctx['fb_pixel'] = fb.strip()
             if fb := settings.fb_app_id:

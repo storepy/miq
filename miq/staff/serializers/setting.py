@@ -53,7 +53,7 @@ class SiteSettingSerializer(serializers.ModelSerializer):
         fields = (
             'is_live', 'logo',
             'contact_number', 'contact_number_title', 'contact_number_display',
-            'contact_email', 'whatsapp_link', 'whatsapp_link_title',
+            'contact_email', 'whatsapp_number', 'whatsapp_link', 'whatsapp_link_title',
             'ga_tracking', 'fb_pixel', 'fb_app_id', 'fb_app_secret',
 
             *CloseTemplateSettingSerializer.Meta.fields,
