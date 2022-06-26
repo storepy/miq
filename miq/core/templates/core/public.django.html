@@ -17,6 +17,11 @@
   <!-- CLOSE -->{% include 'core/index-close.html' %}<!-- CLOSE END -->
 {% else %}
 <!-- OPEN -->
+
+{% if view_mode == 'admin' %}
+<div class="text-sm text-center">You're viewing this site in admin mode</div>
+{% endif %}
+
 <div class="public">
   <!-- HEADER -->
   <header id="public-header">

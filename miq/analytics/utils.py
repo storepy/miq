@@ -1,10 +1,16 @@
 
-from miq.utils import get_ip
+from ..core.utils import get_ip
 
-from ..models import Hit
+from .models import Hit
 
 
 def create_hit(request, response, /, source: str = None) -> Hit:
+    if not request.session.session_key:
+        try:
+            request.session.save()
+        except Exception:
+            return
+
     path = request.build_absolute_uri() \
         or request.get_full_path_info() \
         or request.get_full_path() \
@@ -15,12 +21,6 @@ def create_hit(request, response, /, source: str = None) -> Hit:
     source = source or request.session.get('source')
     # if not source and request.user.is_authenticated:
     #     source = request.user.slug
-
-    if not request.session.session_key:
-        try:
-            request.session.save()
-        except Exception:
-            return
 
     data = {
         'site_id': '',

@@ -114,10 +114,17 @@ class SiteMiddleware(CurrentSiteMiddleware):
                 sD['fb_app_secret'] = fb.strip()
 
         display_live = ctx.get('is_live', False) is True or request.path == '/login/'
+
+        view_mode = 'user'
         if request.user.is_authenticated and request.user.is_staff:
             display_live = True
 
+        if display_live and not ctx.get('is_live', False):
+            view_mode = 'admin'
+
         ctx['display_live'] = display_live
+        ctx['view_mode'] = view_mode
+        sD['view_mode'] = view_mode
 
         if 'site' not in sD:
             sD.update({
