@@ -4,9 +4,9 @@ from django.conf import settings
 
 from django.utils.translation import gettext_lazy as _
 
-from core.models import BaseModelMixin
+from ...core.models import BaseModelMixin
 
-from .managers import HitManager
+from .managers import HitManager, HitPublicManager
 
 
 def jsondef():
@@ -23,6 +23,7 @@ class Hit(BaseModelMixin):
     # session key
     session = models.CharField(max_length=300)
     session_data = models.JSONField(_("Session Data"), default=jsondef)
+    url = models.TextField(max_length=500)
     path = models.TextField(max_length=500)
     referrer = models.TextField(blank=True, null=True)
     user_agent = models.TextField(blank=True, null=True)
@@ -39,6 +40,7 @@ class Hit(BaseModelMixin):
     #
 
     objects = HitManager()
+    public = HitPublicManager()
 
     class Meta:
         ordering = ('-created', '-updated',)
@@ -49,14 +51,15 @@ class Hit(BaseModelMixin):
         return f'{self.response_status}: {self.path}'
 
 
-# class SearchTerm(BaseModelMixin):
-#     value = models.CharField(_("Term"), max_length=99)
-#     count = models.PositiveIntegerField(_("Count"), default=0)
+class SearchTerm(BaseModelMixin):
+    session = models.CharField(max_length=300)
+    value = models.CharField(_("Term"), max_length=99)
+    count = models.PositiveIntegerField(_("Count"), default=1)
 
-#     class Meta:
-#         verbose_name = _('Search Term')
-#         verbose_name_plural = _('Search Terms')
-#         ordering = ('-created',)
+    class Meta:
+        verbose_name = _('Search Term')
+        verbose_name_plural = _('Search Terms')
+        ordering = ('-updated', '-created',)
 
 
 # class HitRangeUnit(models.TextChoices):

@@ -8,9 +8,14 @@ from django.db import models
 
 
 class HitQueryset(models.QuerySet):
-    pass
+    def is_search(self):
+        return self.filter(path__contains='?=')
 
 
 class HitManager(models.Manager):
+    pass
+
+
+class HitPublicManager(HitManager):
     def get_queryset(self, *args, **kwargs):
-        return HitQueryset(self.model, using='analytics')
+        super().get_queryset(*args, **kwargs).exclude(path__startswith='/admin')
