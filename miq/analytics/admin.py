@@ -4,7 +4,10 @@ from .models import Hit, SearchTerm
 
 
 class HitModelAdmin(admin.ModelAdmin):
-    list_display = ('path', 'source_id', 'ip', 'method', 'response_status', 'debug', 'url', 'slug',)
+    list_display = (
+        'path', 'source_id', 'session', 'ip', 'method',
+        'referrer', 'response_status', 'debug', 'url', 'slug',
+    )
 
 
 admin.site.register(Hit, HitModelAdmin)
