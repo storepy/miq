@@ -6,7 +6,7 @@ from ..core.utils import get_ip
 from .models import Hit, SearchTerm
 
 exclude = [
-    '/admin/',
+    '/admin/', 'staff',
     '/media/', '/favicon.ico',
 ]
 
@@ -35,7 +35,7 @@ def create_hit(request, response, /, source: str = None) -> Hit:
 
     session = request.session.session_key
     data = {
-        'site_id': '',
+        'site_id': request.site.id,
         'ip': get_ip(request),
         'url': url,
         'path': request.path,

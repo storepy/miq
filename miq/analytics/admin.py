@@ -5,8 +5,8 @@ from .models import Hit, SearchTerm
 
 class HitModelAdmin(admin.ModelAdmin):
     list_display = (
-        'path', 'source_id', 'session', 'ip', 'method',
-        'referrer', 'response_status', 'debug', 'url', 'slug',
+        'path', 'method', 'source_id', 'session', 'ip',
+        'referrer', 'response_status', 'user_agent', 'debug', 'url', 'slug',
     )
 
 
