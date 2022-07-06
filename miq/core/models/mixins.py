@@ -26,6 +26,12 @@ class BaseModelMixin(models.Model):
         editable=False
     )
 
+    def get_hit_data(self):
+        return {
+            'app': self._meta.app_label.lower(),
+            'model': self._meta.model_name.lower(),
+        }
+
     class Meta:
         abstract = True
 

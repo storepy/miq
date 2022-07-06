@@ -1,6 +1,8 @@
 
 from urllib.parse import urlparse, parse_qs
 
+from django.apps import apps
+
 from ..core.utils import get_ip
 
 from .models import Hit, SearchTerm
@@ -44,9 +46,15 @@ def create_hit(request, response, /, source: str = None) -> Hit:
         'method': request.method,
         'user_agent': request.META.get('HTTP_USER_AGENT'),
         'session': session,
-        # 'session_data': request.session.get_decoded(),
         'response_status': response.status_code,
     }
+
+    content = response.context_data.get('object')
+    if content:
+        try:
+            data['session_data'] = content.get_hit_data()
+        except Exception as e:
+            print(e)
 
     query = parse_qs(urlparse(url).query).get('q', [])
     for q in query:
