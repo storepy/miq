@@ -52,7 +52,11 @@ def create_hit(request, response, /, source: str = None) -> Hit:
     content = response.context_data.get('object')
     if content:
         try:
-            data['session_data'] = content.get_hit_data()
+            hit_data = content.get_hit_data()
+            data['session_data'] = hit_data
+            data['app'] = hit_data.get('app')
+            data['model'] = hit_data.get('model')
+
         except Exception as e:
             print(e)
 

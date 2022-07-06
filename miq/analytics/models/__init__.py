@@ -21,6 +21,8 @@ class Hit(BaseModelMixin):
     source_id = models.CharField(max_length=500, blank=True, null=True)
 
     # session key
+    app = models.CharField(max_length=300, null=True, blank=True)
+    model = models.CharField(max_length=300, null=True, blank=True)
     session = models.CharField(max_length=300)
     session_data = models.JSONField(_("Session Data"), default=jsondef)
     url = models.TextField(max_length=500)
