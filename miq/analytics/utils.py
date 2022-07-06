@@ -49,7 +49,7 @@ def create_hit(request, response, /, source: str = None) -> Hit:
         'response_status': response.status_code,
     }
 
-    content = response.context_data.get('object')
+    content = getattr(response, 'context_data', {}).get('object')
     if content:
         try:
             hit_data = content.get_hit_data()
