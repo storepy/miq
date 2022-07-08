@@ -46,4 +46,5 @@ class HitManager(models.Manager):
 
 class HitPublicManager(HitManager):
     def get_queryset(self, *args, **kwargs):
-        super().get_queryset(*args, **kwargs).exclude(path__startswith='/admin')
+        super().get_queryset(*args, **kwargs)\
+            .exclude(path__startswith='/admin')

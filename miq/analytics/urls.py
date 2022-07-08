@@ -3,14 +3,14 @@ from django.urls import path, include
 
 from rest_framework import routers
 
-from miqanalytics.staff import HitStaffViewset
+from . import viewsets
 
 
 app_name = 'miqanalytics'
 
 
 auth_router = routers.DefaultRouter()
-auth_router.register(r'hits', HitStaffViewset)
+auth_router.register(r'hits', viewsets.HitViewset)
 
 
 urlpatterns = [
