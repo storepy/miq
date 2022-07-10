@@ -1,8 +1,6 @@
 
 from urllib.parse import urlparse, parse_qs
 
-from django.apps import apps
-
 from ..core.utils import get_ip
 
 from .models import Hit, SearchTerm
@@ -31,32 +29,33 @@ def create_hit(request, response, /, source: str = None) -> Hit:
         or request.path
 
     #
+
     source = source or request.session.get('source')
     if not source and request.user.is_authenticated:
-        source = f'{request.user.slug}-{request.user.username}___user_slug-user_username'
+        source = f'{request.user.username}-{request.user.slug}___user_slug-user_username'
 
     session = request.session.session_key
     data = {
-        'site_id': request.site.id,
-        'ip': get_ip(request),
         'url': url,
-        'path': request.path,
-        'referrer': request.META.get('HTTP_REFERER'),
-        'source_id': source,
-        'method': request.method,
-        'user_agent': request.META.get('HTTP_USER_AGENT'),
         'session': session,
+        'source_id': source,
+        'path': request.path,
+        'ip': get_ip(request),
+        'method': request.method,
+        'site_id': request.site.id,
         'response_status': response.status_code,
+        'referrer': request.META.get('HTTP_REFERER'),
+        'user_agent': request.META.get('HTTP_USER_AGENT'),
     }
 
-    content = getattr(response, 'context_data', {}).get('object')
-    if content:
+    content = getattr(response, 'context_data', {})
+    if content and (c := content.get('object')):
         try:
-            hit_data = content.get_hit_data()
-            data['session_data'] = hit_data
-            data['app'] = hit_data.get('app')
-            data['model'] = hit_data.get('model')
-
+            hit_data = c.get_hit_data()
+            if hit_data:
+                data['session_data'] = hit_data
+                data['app'] = hit_data.get('app')
+                data['model'] = hit_data.get('model')
         except Exception as e:
             print(e)
 

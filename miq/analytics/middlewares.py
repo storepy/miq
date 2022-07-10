@@ -5,7 +5,6 @@ from .utils import create_hit
 
 
 class AnalyticsMiddleware(CurrentSiteMiddleware):
-
     def __init__(self, get_response):
         self.get_response = get_response
 
@@ -15,6 +14,6 @@ class AnalyticsMiddleware(CurrentSiteMiddleware):
         try:
             create_hit(request, response)
         except Exception as e:
-            print('\n\n==>', e, '\n\n')
+            print('\n\nError creating hit', e, '\n\n')
 
         return response
