@@ -44,6 +44,16 @@ class Hit(BaseModelMixin):
     objects = HitManager()
     public = HitPublicManager()
 
+    def save(self, *args, **kwargs):
+        if not self.pk:
+            if self.referrer:
+                self.referrer = self.referrer.lower()
+
+            if self.user_agent:
+                self.user_agent = self.user_agent.lower()
+
+        return super().save(*args, **kwargs)
+
     class Meta:
         ordering = ('-created', '-updated',)
         verbose_name = _('Hit')

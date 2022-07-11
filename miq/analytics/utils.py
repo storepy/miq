@@ -48,11 +48,10 @@ def create_hit(request, response, /, source: str = None) -> Hit:
         'user_agent': request.META.get('HTTP_USER_AGENT'),
     }
 
-    content = getattr(response, 'context_data', {})
-    if content and (c := content.get('object')):
+    ctx = getattr(response, 'context_data', {})
+    if ctx and (obj := ctx.get('object')):
         try:
-            hit_data = c.get_hit_data()
-            if hit_data:
+            if hit_data := obj.get_hit_data():
                 data['session_data'] = hit_data
                 data['app'] = hit_data.get('app')
                 data['model'] = hit_data.get('model')

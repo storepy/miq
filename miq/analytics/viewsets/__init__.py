@@ -47,11 +47,31 @@ class HitViewset(LoginRequiredMixin, viewsets.ModelViewSet):
     @action(methods=['get'], detail=False, url_path=r'summary')
     def summary(self, request, *args, **kwargs):
         qs = self.get_queryset()
+        today = qs.today()
+        yst = qs.yesterday()
         data = {
-            'today_count': qs.today().count(),
-            'yesterday_count': qs.yesterday().count(),
+            'today': {
+                'count': today.is_not_bot().count(),
+                'bots': today.is_bot().count()
+            },
+            'yesterday': {
+                'count': yst.is_not_bot().count(),
+                'bots': yst.is_bot().count()
+            },
         }
         return Response(data=data)
 
     def get_queryset(self):
-        return super().get_queryset()
+        qs = super().get_queryset()
+        params = self.request.query_params
+        bot = params.get('bot')
+        if bot == '0':
+            qs = qs.is_not_bot()
+        if bot == '1':
+            qs = qs.is_bot()
+
+        path = params.get('path')
+        if path and isinstance(path, str):
+            qs = qs.filter(path__icontains=path)
+
+        return qs

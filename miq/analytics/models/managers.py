@@ -38,6 +38,16 @@ class HitQueryset(models.QuerySet):
         return self.exclude(referrer__isnull=False)
         # .filter(referrer__icontains=domain_name)
 
+    def is_not_bot(self):
+        return self.exclude(pk__in=self.is_bot().values_list('pk', flat=True))
+
+    def is_bot(self):
+        return self.filter(
+            models.Q(path__icontains='bot')
+            | models.Q(user_agent__icontains='bot')
+            | models.Q(user_agent__icontains='robot')
+        ).distinct()
+
 
 class HitManager(models.Manager):
     def get_queryset(self, *args, **kwargs):
