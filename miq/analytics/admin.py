@@ -1,6 +1,6 @@
 from django.contrib import admin
 
-from .models import Hit, SearchTerm
+from .models import Hit, SearchTerm, Campaign
 
 
 class HitModelAdmin(admin.ModelAdmin):
@@ -18,3 +18,10 @@ class SearchTermModelAdmin(admin.ModelAdmin):
 
 
 admin.site.register(SearchTerm, SearchTermModelAdmin)
+
+
+class CampaignModelAdmin(admin.ModelAdmin):
+    list_display = ('key', 'value', 'ip', 'slug',)
+
+
+admin.site.register(Campaign, CampaignModelAdmin)

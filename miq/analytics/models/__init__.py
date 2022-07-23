@@ -74,6 +74,19 @@ class SearchTerm(BaseModelMixin):
         ordering = ('-updated', '-created',)
 
 
+class Campaign(BaseModelMixin):
+    key = models.CharField(max_length=99)
+    value = models.CharField(_("Term"), max_length=99)
+    ip = models.GenericIPAddressField(
+        unpack_ipv4=True, verbose_name=_('Ip address'),
+        null=True, blank=True)
+
+    class Meta:
+        verbose_name = _('Campaign')
+        verbose_name_plural = _('Campaigns')
+        ordering = ('-updated', '-created',)
+
+
 # class HitRangeUnit(models.TextChoices):
 #     HOUR = 'HOUR', _('Hour')
 #     DAY = 'DAY', _('Day')

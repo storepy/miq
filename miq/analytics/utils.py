@@ -3,7 +3,7 @@ from urllib.parse import urlparse, parse_qs
 
 from ..core.utils import get_ip
 
-from .models import Hit, SearchTerm
+from .models import Campaign, Hit, SearchTerm
 
 exclude = [
     '/admin/', 'staff',
@@ -35,12 +35,13 @@ def create_hit(request, response, /, source: str = None) -> Hit:
         source = f'{request.user.username}-{request.user.slug}___user_slug-user_username'
 
     session = request.session.session_key
+    ip = get_ip(request)
     data = {
         'url': url,
         'session': session,
         'source_id': source,
         'path': request.path,
-        'ip': get_ip(request),
+        'ip': ip,
         'method': request.method,
         'site_id': request.site.id,
         'response_status': response.status_code,
@@ -58,8 +59,15 @@ def create_hit(request, response, /, source: str = None) -> Hit:
         except Exception as e:
             print(e)
 
-    query = parse_qs(urlparse(url).query).get('q', [])
-    for q in query:
+    query = parse_qs(urlparse(url).query)
+    for key in query.keys():
+        if key == 'q':
+            continue
+
+        for value in query.get(key, []):
+            Campaign.objects.get_or_create(key=key.lower(), value=value.lower(), ip=ip)
+
+    for q in query.get('q', []):
         if not q:
             continue
 

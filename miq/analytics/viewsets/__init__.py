@@ -1,5 +1,6 @@
 # import logging
 
+from django.db import models
 # from django.db import IntegrityError
 # from django.utils.translation import gettext_lazy as _
 
@@ -13,21 +14,44 @@ from miq.staff.mixins import LoginRequiredMixin
 from miq.core.permissions import DjangoModelPermissions
 from miq.core.pagination import MiqPageNumberPagination
 
-from ..models import Hit
-from ..serializers import HitSerializer
+from ..models import Campaign, Hit, SearchTerm
+from ..serializers import HitSerializer, CampaignSerializer, SearchTermSerializer
 
 
 class HitPagination(MiqPageNumberPagination):
     page_size = 100
 
 
-class HitViewset(LoginRequiredMixin, viewsets.ModelViewSet):
+class Mixin(LoginRequiredMixin, viewsets.ModelViewSet):
     lookup_field = 'slug'
+    parser_classes = (JSONParser, )
+    pagination_class = HitPagination
+    permission_classes = (IsAdminUser, DjangoModelPermissions)
+
+
+class CampaignViewset(Mixin):
+    queryset = Campaign.objects.all()
+    serializer_class = CampaignSerializer
+
+    def get_queryset(self):
+        qs = super().get_queryset()
+        params = self.request.query_params
+        if params.get('summary') == '1':
+            qs = qs.values('key', 'value')\
+                .annotate(count=models.Count('ip'))\
+                .order_by('-count')
+
+        return qs
+
+
+class SearchViewset(Mixin):
+    queryset = SearchTerm.objects.all()
+    serializer_class = SearchTermSerializer
+
+
+class HitViewset(Mixin):
     queryset = Hit.public.all()
     serializer_class = HitSerializer
-    parser_classes = (JSONParser, )
-    permission_classes = (IsAdminUser, DjangoModelPermissions)
-    pagination_class = HitPagination
 
     @action(methods=['post'], detail=False, url_path=r'batch')
     def batch(self, request, *args, **kwargs):
