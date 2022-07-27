@@ -75,6 +75,7 @@ class SearchTerm(BaseModelMixin):
 
 
 class Campaign(BaseModelMixin):
+    is_pinned = models.BooleanField(_("Is pinned"), default=False)
     key = models.CharField(max_length=99)
     value = models.CharField(_("Term"), max_length=99)
     ip = models.GenericIPAddressField(
@@ -84,7 +85,7 @@ class Campaign(BaseModelMixin):
     class Meta:
         verbose_name = _('Campaign')
         verbose_name_plural = _('Campaigns')
-        ordering = ('-updated', '-created',)
+        ordering = ('is_pinned', '-updated', '-created',)
 
 
 # class HitRangeUnit(models.TextChoices):

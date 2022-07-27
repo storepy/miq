@@ -21,7 +21,7 @@ class CampaignSerializer(serializers.ModelSerializer):
         model = Campaign
         queryset = Campaign.objects.all()
         read_only_fields = ('slug', 'key', 'value', 'ip', 'created', 'updated')
-        fields = read_only_fields
+        fields = ('is_pinned', *read_only_fields)
 
 
 class SearchTermSerializer(serializers.ModelSerializer):
