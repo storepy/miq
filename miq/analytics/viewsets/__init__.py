@@ -15,7 +15,8 @@ from miq.core.permissions import DjangoModelPermissions
 from miq.core.pagination import MiqPageNumberPagination
 
 from ..models import Campaign, Hit, SearchTerm
-from ..serializers import HitSerializer, CampaignSerializer, SearchTermSerializer
+from ..serializers import HitSerializer, SearchTermSerializer
+from ..serializers import CampaignSerializer, CampaignSummarySerializer
 
 
 class HitPagination(MiqPageNumberPagination):
@@ -33,15 +34,23 @@ class CampaignViewset(Mixin):
     queryset = Campaign.objects.all()
     serializer_class = CampaignSerializer
 
+    def get_serializer_class(self):
+        if self.is_summary():
+            return CampaignSummarySerializer
+        return super().get_serializer_class()
+
     def get_queryset(self):
         qs = super().get_queryset()
-        params = self.request.query_params
-        if params.get('summary') == '1':
+        # params = self.request.query_params
+        if self.is_summary():
             qs = qs.values('key', 'value')\
                 .annotate(count=models.Count('ip'))\
                 .order_by('-count')
 
         return qs
+
+    def is_summary(self) -> bool:
+        return self.request.query_params.get('summary') == '1'
 
 
 class SearchViewset(Mixin):

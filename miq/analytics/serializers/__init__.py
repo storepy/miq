@@ -16,10 +16,18 @@ class HitSerializer(serializers.ModelSerializer):
         fields = read_only_fields
 
 
-class CampaignSerializer(serializers.ModelSerializer):
+class CampaignSummarySerializer(serializers.ModelSerializer):
     class Meta:
         model = Campaign
         queryset = Campaign.objects.all()
+        read_only_fields = ('key', 'value', 'count',)
+        fields = read_only_fields
+
+    count = serializers.IntegerField()
+
+
+class CampaignSerializer(CampaignSummarySerializer):
+    class Meta(CampaignSummarySerializer.Meta):
         read_only_fields = ('slug', 'key', 'value', 'ip', 'created', 'updated')
         fields = ('is_pinned', *read_only_fields)
 
