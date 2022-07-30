@@ -3,6 +3,24 @@ from json import dumps
 from urllib.parse import quote_plus
 
 
+def get_ig_username_info(username: str, sessionid="11523892542%3AS9jzLFlZelEiVV%3A24", s=requests.Session()):
+    cookies = {'sessionid': sessionid}
+    headers = {'User-Agent': 'Instagram 64.0.0.14.96'}
+
+    r = s.get(
+        f'https://www.instagram.com/{username}/?__a=1&__d=dis',
+        headers=headers, cookies=cookies
+    )
+
+    if r.status_code == 404:
+        return
+
+    try:
+        return r.json()
+    except Exception:
+        return
+
+
 def check_ig_username(username: str):
     data = "signed_body=SIGNATURE." + quote_plus(dumps(
         {"q": f'{username}', "skip_recovery": "1"},
