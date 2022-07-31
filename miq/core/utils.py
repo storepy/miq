@@ -1,3 +1,4 @@
+import base64
 from collections import namedtuple
 import os
 import requests
@@ -50,6 +51,13 @@ def clean_img_url(url: str) -> str:
     if url.startswith('//'):
         url = f'http://{url[2:]}'
     return url
+
+
+def download_img_from_url_to_b64(url, s=requests.Session(), **kwargs):
+    r = s.get(url, **kwargs)
+    if r.status_code != 200:
+        return None
+    return base64.b64encode(r.content)
 
 
 def download_img_from_url(url, request=requests):

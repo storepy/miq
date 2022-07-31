@@ -1,9 +1,10 @@
+
 from pprint import pprint
 import requests
 from json import dumps
 from urllib.parse import quote_plus
 
-from .core.utils import get_dict_key
+from .core.utils import get_dict_key, download_img_from_url_to_b64
 
 
 def map_ig_graphql_to_user(data):
@@ -51,13 +52,29 @@ def map_ig_graphql_to_user(data):
     return i
 
 
-sessionid = "11523892542%3AS9jzLFlZelEiVV%3A24"
+s = requests.Session()
+sessionId = "11523892542%3AS9jzLFlZelEiVV%3A24"
+cookies = {'sessionid': sessionId}
+headers = {'User-Agent': 'Instagram 64.0.0.14.96'}
 
 
-def get_ig_username_info(username: str, sessionid: str = sessionid, s=requests.Session()):
-    cookies = {'sessionid': sessionid}
-    headers = {'User-Agent': 'Instagram 64.0.0.14.96'}
+def get_ig_username_media(data: dict):
+    if url := get_dict_key(data, 'graphql__user__profile_pic_url_hd'):
+        if img := download_img_from_url_to_b64(url, s=s, headers=headers, cookies=cookies):
+            data['graphql']['user']['profile_pic_b64'] = img
 
+    if media := get_dict_key(data, 'graphql__user__edge_owner_to_timeline_media'):
+        for m in media.get('edges', []):
+            m = m['node']
+            print(m.get('display_url'))
+            if (u := m.get('display_url')) and (img := download_img_from_url_to_b64(u, s=s, headers=headers, cookies=cookies)):
+                m['display_url'] = img
+
+            # for c in m.get('edge_sidecar_to_children', []):
+            #     c = c['node']
+
+
+def get_ig_username_info(username: str, s=s):
     r = s.get(
         # f'https://www.instagram.com/unpetitvoyou/?__a=1&__d=dis',
         f'https://www.instagram.com/{username}/?__a=1&__d=dis',
@@ -67,10 +84,16 @@ def get_ig_username_info(username: str, sessionid: str = sessionid, s=requests.S
     if r.status_code == 404:
         return
 
+    # print(r.text)
+
+    data = {}
     try:
-        return r.json()
+        data = r.json()
     except Exception:
         return
+    else:
+        get_ig_username_media(data)
+        return data
 
 
 def check_ig_username(username: str):
@@ -115,3 +138,9 @@ def check_ig_username(username: str):
 
 
 # pprint(res)
+
+# url = 'https://instagram.fewr1-6.fna.fbcdn.net/v/t51.2885-19/287947947_1280893049112350_9127347944203769740_n.jpg?stp=dst-jpg_s320x320&_nc_ht=instagram.fewr1-6.fna.fbcdn.net&_nc_cat=102&_nc_ohc=mvuhab6IuvYAX-9S3at&edm=ABfd0MgBAAAA&ccb=7-5&oh=00_AT8gmMrJU6SAUNlQQY8xuLi8U5RcT7k7hm4ozXwu-G4ufA&oe=62EAF999&_nc_sid=7bff83'
+# r = s.get(url, headers=headers, cookies=cookies)
+# print(r)
+# b64response = base64.b64encode(r.content)
+# print(b64response)
