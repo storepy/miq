@@ -13,6 +13,23 @@ def jsondef():
     return dict()
 
 
+class Landing(BaseModelMixin):
+    name = models.SlugField(_("Name"), max_length=99, unique=True, db_index=True)
+    is_pinned = models.BooleanField(_("Is pinned"), default=False)
+    # hits = models.ManyToManyField("analytics.Hit", verbose_name=_("Hits"), blank=True)
+
+    def hits(self):
+        key = f'p/{self.name}'
+        return Hit.objects.filter(
+            models.Q(path__icontains=key) | models.Q(referrer__icontains=key)
+        ).distinct()
+
+    class Meta:
+        verbose_name = _('Landing')
+        verbose_name_plural = _('Landing')
+        ordering = ('-is_pinned', '-updated', '-created')
+
+
 class Hit(BaseModelMixin):
 
     site_id = models.CharField(max_length=500)
@@ -75,7 +92,6 @@ class SearchTerm(BaseModelMixin):
 
 
 class Campaign(BaseModelMixin):
-    is_pinned = models.BooleanField(_("Is pinned"), default=False)
     key = models.CharField(max_length=99)
     value = models.CharField(_("Term"), max_length=99)
     ip = models.GenericIPAddressField(
@@ -85,7 +101,7 @@ class Campaign(BaseModelMixin):
     class Meta:
         verbose_name = _('Campaign')
         verbose_name_plural = _('Campaigns')
-        ordering = ('is_pinned', '-updated', '-created',)
+        ordering = ('-updated', '-created',)
 
 
 # class HitRangeUnit(models.TextChoices):

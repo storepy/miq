@@ -10,13 +10,13 @@ from rest_framework.parsers import JSONParser
 from rest_framework import viewsets, serializers
 from rest_framework.permissions import IsAdminUser
 
-from miq.staff.mixins import LoginRequiredMixin
-from miq.core.permissions import DjangoModelPermissions
-from miq.core.pagination import MiqPageNumberPagination
+from ...staff.mixins import LoginRequiredMixin
+from ...core.permissions import DjangoModelPermissions
+from ...core.pagination import MiqPageNumberPagination
 
-from ..models import Campaign, Hit, SearchTerm
-from ..serializers import HitSerializer, SearchTermSerializer
+from ..models import Campaign, Hit, SearchTerm, Landing
 from ..serializers import CampaignSerializer, CampaignSummarySerializer
+from ..serializers import HitSerializer, SearchTermSerializer, LandingSerializer
 
 
 class HitPagination(MiqPageNumberPagination):
@@ -108,3 +108,8 @@ class HitViewset(Mixin):
             qs = qs.filter(path__icontains=path)
 
         return qs
+
+
+class LandingViewset(Mixin):
+    queryset = Landing.objects.all()
+    serializer_class = LandingSerializer

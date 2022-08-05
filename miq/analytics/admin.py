@@ -1,6 +1,6 @@
 from django.contrib import admin
 
-from .models import Hit, SearchTerm, Campaign
+from .models import Hit, SearchTerm, Campaign, Landing
 
 
 class HitModelAdmin(admin.ModelAdmin):
@@ -25,3 +25,5 @@ class CampaignModelAdmin(admin.ModelAdmin):
 
 
 admin.site.register(Campaign, CampaignModelAdmin)
+
+admin.site.register(Landing)

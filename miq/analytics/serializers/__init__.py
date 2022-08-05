@@ -1,7 +1,7 @@
 
 from rest_framework import serializers
 
-from ..models import Campaign, Hit, SearchTerm
+from ..models import Campaign, Hit, SearchTerm, Landing
 
 
 class HitSerializer(serializers.ModelSerializer):
@@ -29,7 +29,7 @@ class CampaignSummarySerializer(serializers.ModelSerializer):
 class CampaignSerializer(CampaignSummarySerializer):
     class Meta(CampaignSummarySerializer.Meta):
         read_only_fields = ('slug', 'key', 'value', 'ip', 'created', 'updated')
-        fields = ('is_pinned', *read_only_fields)
+        fields = read_only_fields
 
 
 class SearchTermSerializer(serializers.ModelSerializer):
@@ -38,3 +38,25 @@ class SearchTermSerializer(serializers.ModelSerializer):
         queryset = SearchTerm.objects.all()
         read_only_fields = ('slug', 'session', 'value', 'count', 'created', 'updated')
         fields = read_only_fields
+
+
+class LandingSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = Landing
+        queryset = Landing.objects.all()
+        read_only_fields = ('slug', 'hits', 'created', 'updated')
+        fields = (
+            # *read_only_fields,
+            'name', 'is_pinned'
+        )
+
+    class LandingHitSerializer(serializers.ModelSerializer):
+        class Meta:
+            model = Hit
+            queryset = Hit.objects.all()
+            read_only_fields = (
+                'slug', 'url', 'path', 'source_id', 'ip', 'session',
+                'referrer', 'user_agent', 'method', 'response_status', 'debug',
+            )
+            fields = read_only_fields
+    hits = LandingHitSerializer(many=True, read_only=True)
