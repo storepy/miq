@@ -15,7 +15,7 @@ app_name = 'core'
 
 # auth_router = routers.DefaultRouter()
 
-# auth_router.register(r'account', AccountUpdateViewset)
+
 # auth_router.register(r'sections', SectionViewset)
 # auth_router.register(r'images', ImageViewset)
 # auth_router.register(r'files', FileViewset)

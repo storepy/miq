@@ -70,24 +70,6 @@ class UserListSerializer(serializers.ModelSerializer):
             return ImageSerializer(obj.img).data
 
 
-class AccountSerializer(UserListSerializer):
-    # Use in /accounts/account/
-
-    class Meta(UserListSerializer.Meta):
-        read_only_fields = ('username', 'slug', 'email')
-        fields = (
-            *read_only_fields,
-            # 'username', 'slug', 'email',
-            'first_name', 'last_name', 'name',
-            'initials', 'gender', 'gender_label',
-            'img', 'img_data',
-            # 'birthdate', 'phone',
-            # 'img', 'is_email_verified'
-        )
-
-    gender_label = serializers.ReadOnlyField()
-
-
 """
 # SECTION
 """
