@@ -12,8 +12,10 @@ from .managers import HitManager, HitPublicManager
 def jsondef():
     return dict()
 
+# Link in Bio
 
-class Landing(BaseModelMixin):
+
+class LIB(BaseModelMixin):
     name = models.SlugField(_("Name"), max_length=99, unique=True, db_index=True)
     is_pinned = models.BooleanField(_("Is pinned"), default=False)
     # hits = models.ManyToManyField("analytics.Hit", verbose_name=_("Hits"), blank=True)
@@ -25,8 +27,8 @@ class Landing(BaseModelMixin):
         ).distinct()
 
     class Meta:
-        verbose_name = _('Landing')
-        verbose_name_plural = _('Landing')
+        verbose_name = _('Link in bio')
+        verbose_name_plural = _('Links in bio')
         ordering = ('-is_pinned', '-updated', '-created')
 
 

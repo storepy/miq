@@ -12,12 +12,12 @@ app_name = 'miqanalytics'
 
 auth_router = routers.DefaultRouter()
 auth_router.register(r'hits', viewsets.HitViewset)
-auth_router.register(r'landings', viewsets.LandingViewset)
+auth_router.register(r'libs', viewsets.LIBViewset)
 auth_router.register(r'campaigns', viewsets.CampaignViewset)
 auth_router.register(r'searchterms', viewsets.SearchViewset)
 
 
 urlpatterns = [
-    path('p/<slug:name>/', views.LandingView.as_view(), name='landing'),
+    path('p/<slug:name>/', views.LIBView.as_view(), name='lib'),
     path(f'{settings.API_PATH}/', include(auth_router.urls)),
 ]

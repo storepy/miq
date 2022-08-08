@@ -6,16 +6,16 @@ from django.apps import apps
 
 from ...core.views.generic import DetailView
 
-# from ..models import Landing
-# from ..serializers import LandingSerializer
+# from ..models import LIB
+# from ..serializers import LIBSerializer
 
 
-class LandingView(DetailView):
+class LIBView(DetailView):
     template_name = 'analytics/base.django.html'
 
     def get_object(self, *args, **kwargs):
         pass
-        # return Landing.objects.get_or_create(name=self.kwargs.get('name'))[0]
+        # return LIB.objects.get_or_create(name=self.kwargs.get('name'))[0]
 
     def get_context_data(self, **kwargs: dict):
         ctx = super().get_context_data(**kwargs)

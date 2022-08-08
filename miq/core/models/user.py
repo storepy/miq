@@ -111,3 +111,14 @@ class User(BaseModelMixin, AbstractUser):
             i += self.last_name[0]
 
         return i.upper()
+
+    def get_hit_data(self):
+        data = {
+            **super().get_hit_data(),
+            'username': self.username,
+            'is_staff': self.is_staff
+        }
+        if self.img:
+            data['img'] = self.img.src.url
+
+        return data

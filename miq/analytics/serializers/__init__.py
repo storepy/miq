@@ -1,7 +1,7 @@
 
 from rest_framework import serializers
 
-from ..models import Campaign, Hit, SearchTerm, Landing
+from ..models import Campaign, Hit, SearchTerm, LIB
 
 
 class HitSerializer(serializers.ModelSerializer):
@@ -40,17 +40,17 @@ class SearchTermSerializer(serializers.ModelSerializer):
         fields = read_only_fields
 
 
-class LandingSerializer(serializers.ModelSerializer):
+class LIBSerializer(serializers.ModelSerializer):
     class Meta:
-        model = Landing
-        queryset = Landing.objects.all()
+        model = LIB
+        queryset = LIB.objects.all()
         read_only_fields = ('slug', 'hits', 'created', 'updated')
         fields = (
             # *read_only_fields,
             'name', 'is_pinned'
         )
 
-    class LandingHitSerializer(serializers.ModelSerializer):
+    class LIBHitSerializer(serializers.ModelSerializer):
         class Meta:
             model = Hit
             queryset = Hit.objects.all()
@@ -59,4 +59,4 @@ class LandingSerializer(serializers.ModelSerializer):
                 'referrer', 'user_agent', 'method', 'response_status', 'debug',
             )
             fields = read_only_fields
-    hits = LandingHitSerializer(many=True, read_only=True)
+    hits = LIBHitSerializer(many=True, read_only=True)

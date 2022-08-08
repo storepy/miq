@@ -10,8 +10,15 @@ exclude = [
     '/media/', '/favicon.ico',
 ]
 
+# SESSION APP KEYS
+cus_key = '_cus'
+cart_key = '_cart'
+cached_query_key = '_cqk'
+
 
 def create_hit(request, response, /, source: str = None) -> Hit:
+    if request.method == 'OPTIONS':
+        return
     for match in exclude:
         if match in request.path:
             return
@@ -29,37 +36,62 @@ def create_hit(request, response, /, source: str = None) -> Hit:
         or request.path
 
     #
-
-    source = source or request.session.get('source')
-    if not source and request.user.is_authenticated:
-        source = f'{request.user.username}-{request.user.slug}___user_slug-user_username'
-
-    session = request.session.session_key
     ip = get_ip(request)
+    session = request.session.session_key
     data = {
+        'ip': ip,
         'url': url,
         'session': session,
-        'source_id': source,
+        'session_data': {},
         'path': request.path,
-        'ip': ip,
         'method': request.method,
         'site_id': request.site.id,
-        'response_status': response.status_code,
         'referrer': request.META.get('HTTP_REFERER'),
         'user_agent': request.META.get('HTTP_USER_AGENT'),
+        'response_status': response.status_code,
     }
 
-    ctx = getattr(response, 'context_data', {})
-    if ctx and (obj := ctx.get('object')):
-        try:
-            if hit_data := obj.get_hit_data():
-                data['session_data'] = hit_data
-                data['app'] = hit_data.get('app')
-                data['model'] = hit_data.get('model')
-        except Exception as e:
-            print(e)
+    # CART
 
-    query = parse_qs(urlparse(url).query)
+    if cart := request.session.get(cart_key):
+        data['session_data'][cart_key] = cart
+
+    # CUSTOMER
+
+    if cus := request.session.get(cus_key):
+        data['session_data'][cus_key] = cus
+
+    source = source or request.session.get('source')
+    ctx = getattr(response, 'context_data') or {}
+    obj = ctx.get('object')
+
+    if obj:
+        if (hit_data := obj.get_hit_data()) and (isinstance(hit_data, dict)):
+            data['app'] = hit_data.pop('app', None)
+            data['model'] = hit_data.pop('model', None)
+            data['session_data'].update(hit_data)
+
+        if not source:
+            source = f'{obj.slug}'
+
+    if not source and request.user.is_authenticated:
+        source = f'{request.user.slug}'
+        _d = request.user.get_hit_data()
+        data.update({'app': _d.pop('app', None), 'model': _d.pop('model', None)})
+        data['session_data'].update({
+            **_d,
+            'username': request.user.username
+        })
+
+    if source:
+        data.update({'source_id': source})
+
+    cached_query = request.session.get(cached_query_key) or {}
+    query = {**cached_query, **parse_qs(urlparse(url).query)}
+    if query:
+        request.session.update({cached_query_key: query})
+        data['session_data'].update({'query': query})
+
     for key in query.keys():
         if key == 'q':
             continue

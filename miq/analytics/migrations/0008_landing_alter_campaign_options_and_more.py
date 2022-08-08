@@ -12,7 +12,7 @@ class Migration(migrations.Migration):
 
     operations = [
         migrations.CreateModel(
-            name='Landing',
+            name='LIB',
             fields=[
                 ('id', models.BigAutoField(auto_created=True, primary_key=True, serialize=False, verbose_name='ID')),
                 ('slug', models.SlugField(default=uuid.uuid4, editable=False, max_length=100, unique=True)),
@@ -22,14 +22,15 @@ class Migration(migrations.Migration):
                 ('is_pinned', models.BooleanField(default=False, verbose_name='Is pinned')),
             ],
             options={
-                'verbose_name': 'Landing',
-                'verbose_name_plural': 'Landing',
+                'verbose_name': 'LIB',
+                'verbose_name_plural': 'LIB',
                 'ordering': ('-is_pinned', '-updated', '-created'),
             },
         ),
         migrations.AlterModelOptions(
             name='campaign',
-            options={'ordering': ('-updated', '-created'), 'verbose_name': 'Campaign', 'verbose_name_plural': 'Campaigns'},
+            options={'ordering': ('-updated', '-created'), 'verbose_name': 'Campaign',
+                     'verbose_name_plural': 'Campaigns'},
         ),
         migrations.RemoveField(
             model_name='campaign',

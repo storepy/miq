@@ -1,7 +1,7 @@
 # import logging
 
+
 from django.db import models
-# from django.db import IntegrityError
 # from django.utils.translation import gettext_lazy as _
 
 from rest_framework.decorators import action
@@ -14,9 +14,9 @@ from ...staff.mixins import LoginRequiredMixin
 from ...core.permissions import DjangoModelPermissions
 from ...core.pagination import MiqPageNumberPagination
 
-from ..models import Campaign, Hit, SearchTerm, Landing
+from ..models import Campaign, Hit, SearchTerm, LIB
 from ..serializers import CampaignSerializer, CampaignSummarySerializer
-from ..serializers import HitSerializer, SearchTermSerializer, LandingSerializer
+from ..serializers import HitSerializer, SearchTermSerializer, LIBSerializer
 
 
 class HitPagination(MiqPageNumberPagination):
@@ -80,18 +80,11 @@ class HitViewset(Mixin):
     @action(methods=['get'], detail=False, url_path=r'summary')
     def summary(self, request, *args, **kwargs):
         qs = self.get_queryset()
-        today = qs.today()
-        yst = qs.yesterday()
-        data = {
-            'today': {
-                'count': today.is_not_bot().count(),
-                'bots': today.is_bot().count()
-            },
-            'yesterday': {
-                'count': yst.is_not_bot().count(),
-                'bots': yst.is_bot().count()
-            },
-        }
+        data = qs.is_not_bot().exclude(method='OPTIONS')\
+            .values('created__date', 'path',)\
+            .annotate(count=models.Count('path'))\
+            .order_by('-created__date', '-count')
+
         return Response(data=data)
 
     def get_queryset(self):
@@ -110,6 +103,6 @@ class HitViewset(Mixin):
         return qs
 
 
-class LandingViewset(Mixin):
-    queryset = Landing.objects.all()
-    serializer_class = LandingSerializer
+class LIBViewset(Mixin):
+    queryset = LIB.objects.all()
+    serializer_class = LIBSerializer
