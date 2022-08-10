@@ -44,6 +44,7 @@ class File(BaseModelMixin):
     site = models.ForeignKey(
         Site, on_delete=models.CASCADE,
         related_name='files')
+
     # Uploader
     user = models.ForeignKey(
         User, on_delete=models.SET_NULL,
@@ -68,7 +69,8 @@ class File(BaseModelMixin):
         return f'{self.src}'
 
     def save(self, *args, **kwargs):
-        self.source_app = self._meta.app_label
+        if not self.source_app:
+            self.source_app = self._meta.app_label
         return super().save(*args, **kwargs)
 
     @property

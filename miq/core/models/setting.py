@@ -50,12 +50,14 @@ class SiteSetting(BaseModelMixin):
 
     # INFO
 
-    ico_link = models.URLField(
-        _("Favicon link"), max_length=200,
-        null=True, blank=True)
+    ico = models.OneToOneField(
+        "core.File", on_delete=models.SET_NULL, verbose_name=_("Favicon link"),
+        related_name='ico', null=True, blank=True,
+    )
     logo = models.OneToOneField(
         "core.Image", verbose_name=_("Logo"),
-        on_delete=models.SET_NULL, null=True, blank=True
+        on_delete=models.SET_NULL, null=True, blank=True,
+        related_name='setting'
     )
 
     about = models.TextField(
@@ -121,7 +123,7 @@ class SiteSetting(BaseModelMixin):
         return f'Settings: {self.site}'
 
     def save(self, *args, **kwargs):
-        self.extra = {**setting_config_dict(), **self.config}
+        self.config = {**setting_config_dict(), **self.config}
         super().save(*args, **kwargs)
 
     @property

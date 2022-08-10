@@ -4,9 +4,10 @@ from django.contrib.sites.models import Site
 
 from rest_framework import serializers
 
-from miq.core.models import SiteSetting, Image
+from miq.core.models import SiteSetting, Image, File
 
 
+from .file import FileSerializer
 from .image import ImageSerializer
 
 
@@ -49,9 +50,9 @@ class SiteSettingPagesSerializer(serializers.ModelSerializer):
 class SiteSettingSerializer(serializers.ModelSerializer):
     class Meta:
         model = SiteSetting
-        read_only_fields = ('slug', 'site', 'logo_data', 'ct_image_data')
+        read_only_fields = ('slug', 'site', 'logo_data', 'ico_data', 'ct_image_data', 'config')
         fields = (
-            'is_live', 'logo',
+            'is_live', 'logo', 'ico',
             'contact_number', 'contact_number_title', 'contact_number_display',
             'contact_email', 'whatsapp_number', 'whatsapp_link', 'whatsapp_link_title',
             'ga_tracking', 'fb_pixel', 'fb_app_id', 'fb_app_secret',
@@ -62,6 +63,10 @@ class SiteSettingSerializer(serializers.ModelSerializer):
         )
 
     site = SiteSerializer(required=False)
+    ico = serializers.SlugRelatedField(
+        slug_field="slug", queryset=File.objects.all(), required=False,)
+    ico_data = FileSerializer(source='ico', read_only=True)
+
     logo = serializers.SlugRelatedField(
         slug_field="slug", queryset=Image.objects.active(), required=False,)
     logo_data = ImageSerializer(source='logo', read_only=True)

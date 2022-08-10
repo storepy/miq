@@ -17,6 +17,7 @@ staff_router.register(r'search-staff', viewsets.SearchView)
 
 staff_router.register(r'pages', viewsets.PageViewset)
 staff_router.register(r'index', viewsets.IndexViewset)
+staff_router.register(r'stafffiles', viewsets.FileViewset, 'stafffile')
 staff_router.register(r'staffimages', viewsets.ImageViewset, 'staffimage')
 staff_router.register(r'settings', viewsets.SiteSettingViewset)
 

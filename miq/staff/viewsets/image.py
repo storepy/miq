@@ -6,12 +6,12 @@ from rest_framework.response import Response
 from rest_framework import viewsets, status, serializers
 from rest_framework.parsers import JSONParser, MultiPartParser
 
-from miq.core.models import Image
+from miq.core.models import Image, File
 from miq.core.utils import get_file_ext
 from miq.core.utils import download_img_from_url, img_file_from_response
 
 from ..mixins import LoginRequiredMixin
-from ..serializers import ImageSerializer
+from ..serializers import ImageSerializer, FileSerializer
 
 """
 IMAGE
@@ -25,7 +25,6 @@ class ImageViewset(LoginRequiredMixin, viewsets.ModelViewSet):
     serializer_class = ImageSerializer
 
     def create(self, request, *args, **kwargs):
-
         data = request.data
         src = data.get('src')
         if isinstance(src, str):
@@ -53,6 +52,19 @@ class ImageViewset(LoginRequiredMixin, viewsets.ModelViewSet):
     def get_queryset(self):
         qs = Image.objects.all().site(get_current_site(self.request))
         return qs
+
+    def perform_create(self, ser):
+        ser.save(site=get_current_site(self.request), user=self.request.user)
+
+
+class FileViewset(LoginRequiredMixin, viewsets.ModelViewSet):
+    lookup_field = 'slug'
+    queryset = File.objects.none()
+    parser_classes = (JSONParser, MultiPartParser)
+    serializer_class = FileSerializer
+
+    def get_queryset(self):
+        return File.objects.all().site(get_current_site(self.request))
 
     def perform_create(self, ser):
         ser.save(site=get_current_site(self.request), user=self.request.user)

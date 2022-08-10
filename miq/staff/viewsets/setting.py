@@ -6,7 +6,7 @@ from rest_framework.parsers import JSONParser
 from rest_framework.permissions import IsAdminUser
 from rest_framework.generics import get_object_or_404
 
-from miq.core.models import SiteSetting
+from ...core.models import SiteSetting
 
 from ..mixins import LoginRequiredMixin
 from ..serializers import SiteSettingSerializer, SiteSerializer, SiteSettingPagesSerializer
@@ -24,6 +24,13 @@ class SiteSettingViewsetMixin(LoginRequiredMixin, mixins.RetrieveModelMixin, mix
 
 class SiteSettingViewset(SiteSettingViewsetMixin):
     serializer_class = SiteSettingSerializer
+
+    @action(methods=['patch'], detail=True)
+    def config(self, request, *args, **kwargs):
+        obj = self.get_object()
+        obj.config = {**obj.config, **request.data}
+        obj.save()
+        return self.retrieve(request, *args, **kwargs)
 
     @action(methods=['patch'], detail=True)
     def pages(self, request, *args, **kwargs):
