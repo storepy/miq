@@ -3,7 +3,6 @@ from django.urls import path, include
 
 from rest_framework import routers
 
-from . import views
 from . import viewsets
 
 
@@ -18,6 +17,5 @@ auth_router.register(r'searchterms', viewsets.SearchViewset)
 
 
 urlpatterns = [
-    path('p/<slug:name>/', views.LIBView.as_view(), name='lib'),
     path(f'{settings.API_PATH}/', include(auth_router.urls)),
 ]

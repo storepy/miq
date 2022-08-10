@@ -40,23 +40,28 @@ class SearchTermSerializer(serializers.ModelSerializer):
         fields = read_only_fields
 
 
+class LIBHitSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = Hit
+        queryset = Hit.objects.all()
+        read_only_fields = (
+            'slug', 'url', 'path', 'source_id', 'ip', 'session',
+            'referrer', 'user_agent', 'method', 'response_status', 'debug',
+        )
+        fields = read_only_fields
+
+
 class LIBSerializer(serializers.ModelSerializer):
     class Meta:
         model = LIB
         queryset = LIB.objects.all()
-        read_only_fields = ('slug', 'hits', 'created', 'updated')
+        read_only_fields = ('slug', 'utm_campaign', 'hits', 'created', 'updated')
         fields = (
             # *read_only_fields,
-            'name', 'is_pinned'
+            'name', 'is_pinned',
+            'utm_medium', 'utm_source', 'utm_content',
         )
 
-    class LIBHitSerializer(serializers.ModelSerializer):
-        class Meta:
-            model = Hit
-            queryset = Hit.objects.all()
-            read_only_fields = (
-                'slug', 'url', 'path', 'source_id', 'ip', 'session',
-                'referrer', 'user_agent', 'method', 'response_status', 'debug',
-            )
-            fields = read_only_fields
+    utm_campaign = serializers.CharField(source='name', read_only=True)
+
     hits = LIBHitSerializer(many=True, read_only=True)

@@ -62,7 +62,8 @@ def create_hit(request, response, /, source: str = None) -> Hit:
         data['session_data'][cus_key] = cus
 
     source = source or request.session.get('source')
-    ctx = getattr(response, 'context_data') or {}
+
+    ctx = getattr(response, 'context_data', None) or {}
     obj = ctx.get('object')
 
     if obj:
