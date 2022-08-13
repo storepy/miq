@@ -90,6 +90,20 @@ class HitViewset(Mixin):
     def get_queryset(self):
         qs = super().get_queryset()
         params = self.request.query_params
+        if path := params.get('path'):
+            qs = qs.filter(path=path)
+
+        if ref := params.get('ref'):
+            qs = qs.filter(referrer=ref)
+        if ip := params.get('ip'):
+            qs = qs.filter(ip=ip)
+
+        if status := params.get('status'):
+            qs = qs.filter(response_status=int(status))
+
+        if ua := params.get('ua'):
+            qs = qs.filter(user_agent=ua)
+
         bot = params.get('bot')
         if bot == '0':
             qs = qs.is_not_bot()

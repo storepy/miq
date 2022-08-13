@@ -1,4 +1,4 @@
-
+from django.apps import apps
 from rest_framework import serializers
 
 from ..models import Campaign, Hit, SearchTerm, LIB
@@ -11,9 +11,22 @@ class HitSerializer(serializers.ModelSerializer):
         read_only_fields = (
             'slug', 'url', 'path', 'source_id', 'app', 'model', 'ip', 'session',
             'referrer', 'user_agent', 'method', 'response_status', 'debug', 'session_data',
-            'created', 'updated'
+            'created', 'updated',
+            #
+            'customer_data'
+
         )
         fields = read_only_fields
+
+    customer_data = serializers.SerializerMethodField()
+
+    def get_customer_data(self, obj):
+        if apps.is_installed('shopy.sales') and (_cus := obj.session_data.get('_cus')):
+            from shopy.sales.models import Customer
+            from shopy.sales.serializers import CustomerSerializer
+
+            return CustomerSerializer(Customer.objects.filter(slug=_cus).first()).data
+        return
 
 
 class CampaignSummarySerializer(serializers.ModelSerializer):
@@ -55,13 +68,16 @@ class LIBSerializer(serializers.ModelSerializer):
     class Meta:
         model = LIB
         queryset = LIB.objects.all()
-        read_only_fields = ('slug', 'utm_campaign', 'hits', 'created', 'updated')
+        read_only_fields = (
+            'slug', 'utm_campaign',
+            #  'hits', 'created', 'updated'
+        )
         fields = (
-            # *read_only_fields,
-            'name', 'is_pinned',
-            'utm_medium', 'utm_source', 'utm_content',
+            *read_only_fields,
+            'name', 'utm_medium', 'utm_source', 'utm_content',
+            # 'is_pinned',
         )
 
     utm_campaign = serializers.CharField(source='name', read_only=True)
 
-    hits = LIBHitSerializer(many=True, read_only=True)
+    # hits = LIBHitSerializer(many=True, read_only=True)

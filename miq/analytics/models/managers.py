@@ -1,6 +1,7 @@
 from django.db import models
 import datetime
 from datetime import date
+from django.db.models import Count
 
 # from datetime import timedelta
 
@@ -10,6 +11,11 @@ from datetime import date
 
 
 class HitQueryset(models.QuerySet):
+    def key_by_created_date(self, key: str, order_by='-created__date'):
+        return self.values('created__date', 'path', key)\
+            .annotate(count=Count(key))\
+            .order_by('-count',).filter(created__date=date.today())
+
     def is_search(self):
         return self.filter(path__contains='?=')
 
@@ -45,7 +51,6 @@ class HitQueryset(models.QuerySet):
         return self.filter(
             models.Q(path__icontains='bot')
             | models.Q(user_agent__icontains='bot')
-            | models.Q(user_agent__icontains='robot')
         ).distinct()
 
 

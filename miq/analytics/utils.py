@@ -1,9 +1,16 @@
-
+import logging
+import datetime
 from urllib.parse import urlparse, parse_qs
+
+from django.utils import timezone
 
 from ..core.utils import get_ip
 
 from .models import Campaign, Hit, SearchTerm
+
+logger = logging.getLogger(__name__)
+loginfo = logger.info
+logerr = logger.error
 
 exclude = [
     '/admin/', 'staff',
@@ -17,16 +24,22 @@ cached_query_key = '_cqk'
 
 
 def create_hit(request, response, /, source: str = None) -> Hit:
+
     if request.method == 'OPTIONS':
+        loginfo('skip option hit creation')
         return
+
     for match in exclude:
         if match in request.path:
+            loginfo(f'skip match: {match} hit creation')
             return
 
     if not request.session.session_key:
         try:
             request.session.save()
-        except Exception:
+            loginfo(f'new session: {request.session.session_key}')
+        except Exception as e:
+            logerr(f'error creating session\n{e}')
             return
 
     url = request.build_absolute_uri() \
@@ -38,28 +51,37 @@ def create_hit(request, response, /, source: str = None) -> Hit:
     #
     ip = get_ip(request)
     session = request.session.session_key
+    path = request.path
+    method = request.method
+    site_id = request.site.id
+    status = response.status_code
+    referrer = request.META.get('HTTP_REFERER')
+    user_agent = request.META.get('HTTP_USER_AGENT')
+
     data = {
         'ip': ip,
         'url': url,
         'session': session,
         'session_data': {},
-        'path': request.path,
-        'method': request.method,
-        'site_id': request.site.id,
-        'referrer': request.META.get('HTTP_REFERER'),
-        'user_agent': request.META.get('HTTP_USER_AGENT'),
-        'response_status': response.status_code,
+        'path': path,
+        'method': method,
+        'site_id': site_id,
+        'referrer': referrer,
+        'user_agent': user_agent,
+        'response_status': status,
     }
 
     # CART
 
     if cart := request.session.get(cart_key):
         data['session_data'][cart_key] = cart
+        loginfo(f'added cart slug to session[{session}] data')
 
     # CUSTOMER
 
     if cus := request.session.get(cus_key):
         data['session_data'][cus_key] = cus
+        loginfo(f'added customer slug to session[{session}] data')
 
     source = source or request.session.get('source')
 
@@ -93,20 +115,34 @@ def create_hit(request, response, /, source: str = None) -> Hit:
         request.session.update({cached_query_key: query})
         data['session_data'].update({'query': query})
 
-    for key in query.keys():
-        if key == 'q':
-            continue
+    last = Hit.objects.filter(
+        ip=ip, session=session, url=url, path=path,
+        method=method, site_id=site_id, response_status=status,
+        created__gt=timezone.now() - datetime.timedelta(minutes=1),
+    )
+    if last.exists() and (hit := last.order_by('-created').first()):
+        # hit.count += 1
+        hit.session_data = {**hit.session_data, **data}
+        hit.save()
+        loginfo(f'updated hit: {hit.slug}')
+    else:
+        hit = Hit.objects.create(**data)
+        loginfo(f'new hit: {hit.slug}')
 
-        for value in query.get(key, []):
-            Campaign.objects.get_or_create(key=key.lower(), value=value.lower(), ip=ip)
+    return hit
 
-    for q in query.get('q', []):
-        if not q:
-            continue
+    # for key in query.keys():
+    #     if key == 'q':
+    #         continue
 
-        term, new = SearchTerm.objects.get_or_create(session=session, value=q)
-        if not new:
-            term.count += 1
-            term.save()
+    #     for value in query.get(key, []):
+    #         Campaign.objects.get_or_create(key=key.lower(), value=value.lower(), ip=ip)
 
-    return Hit.objects.create(**data)
+    # for q in query.get('q', []):
+    #     if not q:
+    #         continue
+
+    #     term, new = SearchTerm.objects.get_or_create(session=session, value=q)
+    #     if not new:
+    #         term.count += 1
+    #         term.save()

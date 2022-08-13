@@ -12,9 +12,10 @@ from django.utils.translation import gettext_lazy as _
 from .mixins import BaseModelMixin
 
 
-__all__ = ['Index', 'Page',
-           # 'PageSectionMeta'
-           ]
+__all__ = [
+    'Index', 'Page',
+    # 'PageSectionMeta'
+]
 
 
 class AbstractPage(BaseModelMixin):

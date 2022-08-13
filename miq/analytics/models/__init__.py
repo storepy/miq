@@ -17,13 +17,11 @@ def jsondef():
 
 class LIB(BaseModelMixin):
     name = models.SlugField(_("Name"), max_length=99, unique=True, db_index=True)
-
-    utm_medium = models.TextField(_(""), blank=True, null=True, help_text="social")
-    utm_source = models.TextField(_(""), blank=True, null=True, help_text="instabio")
-    utm_content = models.TextField(_(""), blank=True, null=True, help_text="")
+    utm_medium = models.TextField(blank=True, null=True, help_text="social")
+    utm_source = models.TextField(blank=True, null=True, help_text="instabio")
+    utm_content = models.TextField(blank=True, null=True, help_text="")
 
     is_pinned = models.BooleanField(_("Is pinned"), default=False)
-    # hits = models.ManyToManyField("analytics.Hit", verbose_name=_("Hits"), blank=True)
 
     def hits(self):
         key = f'p/{self.name}'
@@ -37,7 +35,7 @@ class LIB(BaseModelMixin):
         ordering = ('-is_pinned', '-updated', '-created')
 
     def __str__(self) -> str:
-        return self.name
+        return f'{self.name}'
 
 
 class Hit(BaseModelMixin):
