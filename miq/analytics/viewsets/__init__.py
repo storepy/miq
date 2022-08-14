@@ -120,3 +120,21 @@ class HitViewset(Mixin):
 class LIBViewset(Mixin):
     queryset = LIB.objects.all()
     serializer_class = LIBSerializer
+
+    @action(methods=['get'], detail=True, url_path=r'hits')
+    def hits(self, request, *args, **kwargs):
+        obj = self.get_object()
+        qs = Hit.objects.filter(
+            models.Q(path__icontains=f'{obj.name}')
+            | models.Q(session_data__query__utm_campaign=[obj.name])
+            # models.Q(referrer__icontains=f'{obj.name}')
+        ).distinct()
+        queryset = self.filter_queryset(qs)
+
+        page = self.paginate_queryset(qs)
+        if page is not None:
+            serializer = HitSerializer(page, many=True)
+            return self.get_paginated_response(serializer.data)
+
+        serializer = HitSerializer(queryset, many=True)
+        return Response(serializer.data)

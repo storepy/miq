@@ -25,7 +25,12 @@ class HitSerializer(serializers.ModelSerializer):
             from shopy.sales.models import Customer
             from shopy.sales.serializers import CustomerSerializer
 
-            return CustomerSerializer(Customer.objects.filter(slug=_cus).first()).data
+            try:
+                return CustomerSerializer(
+                    Customer.objects.filter(slug=_cus).first()
+                ).data
+            except Exception:
+                return
         return
 
 
