@@ -6,7 +6,7 @@ from django.utils.translation import gettext_lazy as _
 
 from ...core.models import BaseModelMixin
 
-from .managers import HitManager, HitPublicManager
+from .managers import HitManager, HitPublicManager, LIBManager
 
 
 def jsondef():
@@ -22,6 +22,8 @@ class LIB(BaseModelMixin):
     utm_content = models.TextField(blank=True, null=True, help_text="")
 
     is_pinned = models.BooleanField(_("Is pinned"), default=False)
+
+    objects = LIBManager()
 
     def hits(self):
         key = f'p/{self.name}'
@@ -39,7 +41,6 @@ class LIB(BaseModelMixin):
 
 
 class Hit(BaseModelMixin):
-
     site_id = models.CharField(max_length=500)
 
     # unique identidier, could be a slug for customer, uid for user, etc

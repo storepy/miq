@@ -150,7 +150,7 @@ class Page(AbstractPage):
 
     # For public display
     meta_slug = models.SlugField(
-        max_length=100, unique=True, db_index=True,
+        max_length=500, unique=True, db_index=True,
         default=uuid4
     )
 

@@ -1,4 +1,5 @@
 from django.db import models
+from django.db.models import Value as V
 import datetime
 from datetime import date
 from django.db.models import Count
@@ -9,16 +10,10 @@ from django.db.models import Count
 # from django.utils import timezone
 # from django.db.models.functions import TruncTime
 
+from django.db.models.functions import Concat
 
-class HitQueryset(models.QuerySet):
-    def key_by_created_date(self, key: str, order_by='-created__date'):
-        return self.values('created__date', 'path', key)\
-            .annotate(count=Count(key))\
-            .order_by('-count',).filter(created__date=date.today())
 
-    def is_search(self):
-        return self.filter(path__contains='?=')
-
+class DateQsMixin:
     def today(self):
         today = date.today()
         return self.filter(
@@ -30,6 +25,46 @@ class HitQueryset(models.QuerySet):
         return self.filter(
             created__day=yst.day, created__year=yst.year,
             created__month=yst.month).order_by('-created')
+
+
+class LIBQueryset(DateQsMixin, models.QuerySet):
+    def add_path(self):
+        return self.annotate(
+            path=Concat(V('/p/'), 'name', V('/'), output_field=models.SlugField())
+        )
+
+    def with_hits(self):
+        from miq.analytics.models import Hit
+        libQs = self.add_path()
+
+        print(libQs.values_list('name', flat=True))
+        qs = Hit.objects.filter(
+            # models.Q(path__in=libQs.values_list('path', flat=True))
+            # |libQs.values_list('name', flat=True)
+            models.Q(session_data__query__utm_campaign__contains__in=['igshop', 'catly', 'cataly', 'cata', 'analy'])
+            # models.Q(session_data__query__utm_campaign__contains=['cataly'])
+
+            # | models.Q(session_data__query__utm_campaign__in=libQs.values_list('name', flat=True))
+        ).distinct()
+        print(qs.count())
+        # print(qs[0])
+        return self
+
+
+class LIBManager(models.Manager):
+    def get_queryset(self, *args, **kwargs):
+        return LIBQueryset(self.model, *args, using=self._db, **kwargs)
+
+
+class HitQueryset(DateQsMixin, models.QuerySet):
+
+    def key_by_created_date(self, key: str, order_by='-created__date'):
+        return self.values('created__date', 'path', key)\
+            .annotate(count=Count(key))\
+            .order_by('-count',).filter(created__date=date.today())
+
+    def is_search(self):
+        return self.filter(path__contains='?=')
 
     def social(self):
         # return self.get_queryset().filter(

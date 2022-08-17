@@ -138,3 +138,12 @@ class LIBViewset(Mixin):
 
         serializer = HitSerializer(queryset, many=True)
         return Response(serializer.data)
+
+    def get_queryset(self):
+        qs = super().get_queryset()
+        params = self.request.query_params
+        summary = params.get('summary')
+        if summary:
+            qs = qs.with_hits()
+
+        return qs
