@@ -1,6 +1,5 @@
 # import logging
 
-
 from django.db import models
 # from django.utils.translation import gettext_lazy as _
 
@@ -14,9 +13,8 @@ from ...staff.mixins import LoginRequiredMixin
 from ...core.permissions import DjangoModelPermissions
 from ...core.pagination import MiqPageNumberPagination
 
-from ..models import Campaign, Hit, SearchTerm, LIB
-from ..serializers import CampaignSerializer, CampaignSummarySerializer
-from ..serializers import HitSerializer, SearchTermSerializer, LIBSerializer
+from ..models import Hit, LIB
+from ..serializers import HitSerializer, LIBSerializer
 
 
 class HitPagination(MiqPageNumberPagination):
@@ -30,36 +28,41 @@ class Mixin(LoginRequiredMixin, viewsets.ModelViewSet):
     permission_classes = (IsAdminUser, DjangoModelPermissions)
 
 
-class CampaignViewset(Mixin):
-    queryset = Campaign.objects.all()
-    serializer_class = CampaignSerializer
+def get_hit_qs(request, *, qs=Hit.views.all()):
+    params = request.query_params
 
-    def get_serializer_class(self):
-        if self.is_summary():
-            return CampaignSummarySerializer
-        return super().get_serializer_class()
+    if params.get('__bot') == '1':
+        qs = Hit.bots.all()
 
-    def get_queryset(self):
-        qs = super().get_queryset()
-        # params = self.request.query_params
-        if self.is_summary():
-            qs = qs.values('key', 'value')\
-                .annotate(count=models.Count('ip'))\
-                .order_by('-count')
+    if params.get('__err') == '1':
+        qs = Hit.errors.all()
 
-        return qs
+    if params.get('__public') == '1':
+        qs = qs.is_public()
 
-    def is_summary(self) -> bool:
-        return self.request.query_params.get('summary') == '1'
+    if path := params.get('__path'):
+        qs = qs.filter(path__icontains=path)
+        if params.get('__exact') == '1':
+            qs = qs.filter(path=path)
 
+    if url := params.get('__url'):
+        qs = qs.filter(url__icontains=url)
+    if ref := params.get('__ref'):
+        qs = qs.filter(referrer=ref)
+    if ip := params.get('__ip'):
+        qs = qs.filter(ip=ip)
 
-class SearchViewset(Mixin):
-    queryset = SearchTerm.objects.all()
-    serializer_class = SearchTermSerializer
+    if status := params.get('__status'):
+        qs = qs.filter(response_status=int(status))
+
+    if ua := params.get('__ua'):
+        qs = qs.filter(user_agent=ua)
+
+    return qs
 
 
 class HitViewset(Mixin):
-    queryset = Hit.public.all()
+    queryset = Hit.views.all()
     serializer_class = HitSerializer
 
     @action(methods=['post'], detail=False, url_path=r'batch')
@@ -80,7 +83,7 @@ class HitViewset(Mixin):
     @action(methods=['get'], detail=False, url_path=r'summary')
     def summary(self, request, *args, **kwargs):
         qs = self.get_queryset()
-        data = qs.is_not_bot().exclude(method='OPTIONS')\
+        data = qs.exclude(method='OPTIONS')\
             .values('created__date', 'path',)\
             .annotate(count=models.Count('path'))\
             .order_by('-created__date', '-count')
@@ -88,33 +91,7 @@ class HitViewset(Mixin):
         return Response(data=data)
 
     def get_queryset(self):
-        qs = super().get_queryset()
-        params = self.request.query_params
-        if path := params.get('path'):
-            qs = qs.filter(path=path)
-
-        if ref := params.get('ref'):
-            qs = qs.filter(referrer=ref)
-        if ip := params.get('ip'):
-            qs = qs.filter(ip=ip)
-
-        if status := params.get('status'):
-            qs = qs.filter(response_status=int(status))
-
-        if ua := params.get('ua'):
-            qs = qs.filter(user_agent=ua)
-
-        bot = params.get('bot')
-        if bot == '0':
-            qs = qs.is_not_bot()
-        if bot == '1':
-            qs = qs.is_bot()
-
-        path = params.get('path')
-        if path and isinstance(path, str):
-            qs = qs.filter(path__icontains=path)
-
-        return qs
+        return get_hit_qs(self.request, qs=super().get_queryset())
 
 
 class LIBViewset(Mixin):
@@ -124,11 +101,13 @@ class LIBViewset(Mixin):
     @action(methods=['get'], detail=True, url_path=r'hits')
     def hits(self, request, *args, **kwargs):
         obj = self.get_object()
-        qs = Hit.objects.filter(
-            models.Q(path__icontains=f'{obj.name}')
-            | models.Q(session_data__query__utm_campaign=[obj.name])
-            # models.Q(referrer__icontains=f'{obj.name}')
-        ).distinct()
+        qs = get_hit_qs(
+            self.request,
+            qs=Hit.objects.filter(
+                models.Q(path__icontains=f'{obj.name}')
+                | models.Q(session_data__query__utm_campaign=[obj.name])
+            ).distinct()
+        )
         queryset = self.filter_queryset(qs)
 
         page = self.paginate_queryset(qs)
@@ -147,3 +126,31 @@ class LIBViewset(Mixin):
             qs = qs.with_hits()
 
         return qs
+
+
+# class CampaignViewset(Mixin):
+#     queryset = Campaign.objects.all()
+#     serializer_class = CampaignSerializer
+
+#     def get_serializer_class(self):
+#         if self.is_summary():
+#             return CampaignSummarySerializer
+#         return super().get_serializer_class()
+
+#     def get_queryset(self):
+#         qs = super().get_queryset()
+#         # params = self.request.query_params
+#         if self.is_summary():
+#             qs = qs.values('key', 'value')\
+#                 .annotate(count=models.Count('ip'))\
+#                 .order_by('-count')
+
+#         return qs
+
+#     def is_summary(self) -> bool:
+#         return self.request.query_params.get('summary') == '1'
+
+
+# class SearchViewset(Mixin):
+#     queryset = SearchTerm.objects.all()
+#     serializer_class = SearchTermSerializer

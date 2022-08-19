@@ -12,7 +12,7 @@ from .setting import SiteSetting
 from .section import *
 from .currency import Currency, Currencies
 
-from .mixins import BaseModelMixin
+from .mixins import BaseModelMixin, BaseManagerMixin
 
 
 UserGenders = get_text_choices(UserGender)

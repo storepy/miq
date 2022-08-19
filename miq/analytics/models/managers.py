@@ -1,6 +1,6 @@
 from django.db import models
 from django.db.models import Value as V
-import datetime
+# import datetime
 from datetime import date
 from django.db.models import Count
 
@@ -12,19 +12,15 @@ from django.db.models import Count
 
 from django.db.models.functions import Concat
 
+from ...core.models import BaseManagerMixin
 
-class DateQsMixin:
+
+class DateQsMixin(BaseManagerMixin):
     def today(self):
-        today = date.today()
-        return self.filter(
-            created__day=today.day, created__year=today.year,
-            created__month=today.month).order_by('-created')
+        self.created_today()
 
     def yesterday(self):
-        yst = date.today() - datetime.timedelta(1)
-        return self.filter(
-            created__day=yst.day, created__year=yst.year,
-            created__month=yst.month).order_by('-created')
+        self.created_yesterday()
 
 
 class LIBQueryset(DateQsMixin, models.QuerySet):
@@ -80,13 +76,22 @@ class HitQueryset(DateQsMixin, models.QuerySet):
         # .filter(referrer__icontains=domain_name)
 
     def is_not_bot(self):
-        return self.exclude(pk__in=self.is_bot().values_list('pk', flat=True))
+        return self.exclude(is_bot=True)
 
     def is_bot(self):
-        return self.filter(
-            models.Q(path__icontains='bot')
-            | models.Q(user_agent__icontains='bot')
-        ).distinct()
+        return self.filter(is_bot=True)
+
+    def is_error(self):
+        return self.filter(response_status__gt=299)
+
+    def is_staff(self):
+        return self.filter(path__icontains='/staff')
+
+    def is_admin(self):
+        return self.filter(path__icontains='/miq')
+
+    def is_public(self):
+        return self.exclude(pk__in=self.is_admin()).exclude(pk__in=self.is_staff())
 
 
 class HitManager(models.Manager):
@@ -94,8 +99,18 @@ class HitManager(models.Manager):
         return HitQueryset(self.model, *args, using=self._db, **kwargs)
 
 
-class HitPublicManager(HitManager):
+class ViewsManager(HitManager):
     def get_queryset(self, *args, **kwargs):
-        return super().get_queryset(*args, **kwargs)\
-            .exclude(path__startswith='/admin')\
-            .exclude(path__icontains='/api/')
+        return super().get_queryset(*args, **kwargs).is_not_bot()\
+            .exclude(path__icontains='/api/v1')\
+
+
+
+class BotsManager(HitManager):
+    def get_queryset(self, *args, **kwargs):
+        return super().get_queryset(*args, **kwargs).is_bot()
+
+
+class ErrorsManager(HitManager):
+    def get_queryset(self, *args, **kwargs):
+        return super().get_queryset(*args, **kwargs).is_error()

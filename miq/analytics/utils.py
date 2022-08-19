@@ -1,21 +1,22 @@
+
 import logging
 import datetime
 from urllib.parse import urlparse, parse_qs
+from user_agents import parse as _parse_
 
 from django.utils import timezone
 
 from ..core.utils import get_ip
 
-from .models import Campaign, Hit, SearchTerm
+from .models import Hit
+
+# #  whatsapp
 
 logger = logging.getLogger(__name__)
 loginfo = logger.info
 logerr = logger.error
 
-exclude = [
-    '/admin/', 'staff',
-    '/media/', '/favicon.ico',
-]
+exclude = ['/media/', '/favicon.ico', ]
 
 # SESSION APP KEYS
 cus_key = '_cus'
@@ -23,8 +24,97 @@ cart_key = '_cart'
 cached_query_key = '_cqk'
 
 
-def create_hit(request, response, /, source: str = None) -> Hit:
+flag_paths = [
+    '/wp-login', '/wp-admin', '/install.php', '/netcat/', 'atilektcms', 'modx/manager',
+    '/cgi-bin/mt/mt-check', '/engine/print', '/shell4.php', '/if.php',
+]
 
+
+def get_hit_is_bot(user_agent, *, path=None):
+    if not user_agent:
+        return True
+
+    is_bot = _parse_(user_agent).is_bot or False
+    if not is_bot:
+        bots = [
+            'bot', 'facebookexternalua', 'scrapy', 'expanse',
+            'python', 'aiohttp', 'linkwalker', 'insomnia',
+        ]
+
+        for match in bots:
+            if match in user_agent:
+                is_bot = True
+                break
+
+    if not is_bot and isinstance(path, str) and 'robots.txt' in path:
+        for match in flag_paths:
+            if match in path:
+                is_bot = True
+                break
+
+    return is_bot
+
+
+def parse_ua(user_agent: str):
+    if not user_agent:
+        return {}
+
+    ua = _parse_(user_agent)
+
+    return {
+        'os': ua.os.family,
+        'browser': ua.browser.family,
+        'device': ua.device.family,
+        'device_brand': ua.device.brand,
+        'device_model': ua.device.model,
+        'is_mobile': ua.is_mobile,
+        'is_pc': ua.is_pc,
+        'is_tablet': ua.is_tablet,
+        'is_email_client': ua.is_email_client,
+    }
+
+
+def parse_hit_data(url, referrer, user_agent, session_data):
+    assert url and referrer and user_agent and session_data
+    assert isinstance(session_data, dict), logerr('Session data must be a dict')
+
+    parsed = {}
+    data = {**session_data}
+    parsed.update(data.pop('query', {}))
+
+    if (ref := referrer) and (from_ref := urlparse(ref).netloc) and from_ref not in url:
+        parsed['from_ref'] = from_ref
+
+    for url in [referrer, url]:
+        parsed.update(parse_qs(urlparse(url).query, keep_blank_values=True))
+
+    parsed = {key: ','.join(value) if type(value) is list else value for key, value in parsed.items()}
+
+    if ua_data := parse_ua(user_agent):
+        parsed.update(ua_data)
+    return parsed
+
+
+def parse_hit(hit):
+    hit.parsed_data = parse_hit_data(hit.url, hit.referrer, hit.user_agent, hit.session_data)
+    hit.is_parsed = True
+
+    if not hit.is_bot:
+        hit.is_bot = get_hit_is_bot(hit.user_agent, path=hit.path)
+
+    hit.save()
+    loginfo(f'parsed hit: {hit}')
+
+
+def parse_hits():
+    hits = Hit.objects.filter(is_parsed=False)
+    for hit in hits:
+        parse_hit(hit)
+
+    loginfo(f'parsed {hits.count()} hits')
+
+
+def create_hit(request, response, /, source: str = None) -> Hit:
     if request.method == 'OPTIONS':
         loginfo('skip option hit creation')
         return
@@ -86,7 +176,7 @@ def create_hit(request, response, /, source: str = None) -> Hit:
     source = source or request.session.get('source')
 
     ctx = getattr(response, 'context_data', None) or {}
-    obj = ctx.get('object')
+    obj = ctx.get('object', None)
 
     if obj:
         if (hit_data := obj.get_hit_data()) and (isinstance(hit_data, dict)):
@@ -126,23 +216,12 @@ def create_hit(request, response, /, source: str = None) -> Hit:
         hit.save()
         loginfo(f'updated hit: {hit.slug}')
     else:
-        hit = Hit.objects.create(**data)
+        hit = Hit.objects.create(**{
+            **data,
+            'parsed_data': parse_hit_data(url, referrer, user_agent, data.get('session_data', {})),
+            'is_parsed': True,
+            'is_bot': get_hit_is_bot(user_agent, path=path),
+        })
         loginfo(f'new hit: {hit.slug}')
 
     return hit
-
-    # for key in query.keys():
-    #     if key == 'q':
-    #         continue
-
-    #     for value in query.get(key, []):
-    #         Campaign.objects.get_or_create(key=key.lower(), value=value.lower(), ip=ip)
-
-    # for q in query.get('q', []):
-    #     if not q:
-    #         continue
-
-    #     term, new = SearchTerm.objects.get_or_create(session=session, value=q)
-    #     if not new:
-    #         term.count += 1
-    #         term.save()

@@ -1,15 +1,15 @@
 from django.apps import apps
 from rest_framework import serializers
 
-from ..models import Campaign, Hit, SearchTerm, LIB
+from ..models import Hit, LIB
 
 
 class HitSerializer(serializers.ModelSerializer):
     class Meta:
         model = Hit
-        queryset = Hit.public.all()
+        queryset = Hit.views.all()
         read_only_fields = (
-            'slug', 'url', 'path', 'source_id', 'app', 'model', 'ip', 'session',
+            'slug', 'url', 'path', 'source_id', 'app', 'model', 'ip', 'session', 'parsed_data',
             'referrer', 'user_agent', 'method', 'response_status', 'debug', 'session_data',
             'created', 'updated',
             #
@@ -34,38 +34,11 @@ class HitSerializer(serializers.ModelSerializer):
         return
 
 
-class CampaignSummarySerializer(serializers.ModelSerializer):
-    class Meta:
-        model = Campaign
-        queryset = Campaign.objects.all()
-        read_only_fields = ('key', 'value', 'count',)
-        fields = read_only_fields
-
-    count = serializers.IntegerField()
-
-
-class CampaignSerializer(CampaignSummarySerializer):
-    class Meta(CampaignSummarySerializer.Meta):
-        read_only_fields = ('slug', 'key', 'value', 'ip', 'created', 'updated')
-        fields = read_only_fields
-
-
-class SearchTermSerializer(serializers.ModelSerializer):
-    class Meta:
-        model = SearchTerm
-        queryset = SearchTerm.objects.all()
-        read_only_fields = ('slug', 'session', 'value', 'count', 'created', 'updated')
-        fields = read_only_fields
-
-
 class LIBHitSerializer(serializers.ModelSerializer):
     class Meta:
         model = Hit
         queryset = Hit.objects.all()
-        read_only_fields = (
-            'slug', 'url', 'path', 'source_id', 'ip', 'session',
-            'referrer', 'user_agent', 'method', 'response_status', 'debug',
-        )
+        read_only_fields = ('slug', 'url', 'path', 'ip', 'referrer', 'user_agent', 'parsed_data')
         fields = read_only_fields
 
 
@@ -86,3 +59,27 @@ class LIBSerializer(serializers.ModelSerializer):
     utm_campaign = serializers.CharField(source='name', read_only=True)
 
     # hits = LIBHitSerializer(many=True, read_only=True)
+
+
+# class CampaignSummarySerializer(serializers.ModelSerializer):
+#     class Meta:
+#         model = Campaign
+#         queryset = Campaign.objects.all()
+#         read_only_fields = ('key', 'value', 'count',)
+#         fields = read_only_fields
+
+#     count = serializers.IntegerField()
+
+
+# class CampaignSerializer(CampaignSummarySerializer):
+#     class Meta(CampaignSummarySerializer.Meta):
+#         read_only_fields = ('slug', 'key', 'value', 'ip', 'created', 'updated')
+#         fields = read_only_fields
+
+
+# class SearchTermSerializer(serializers.ModelSerializer):
+#     class Meta:
+#         model = SearchTerm
+#         queryset = SearchTerm.objects.all()
+#         read_only_fields = ('slug', 'session', 'value', 'count', 'created', 'updated')
+#         fields = read_only_fields

@@ -1,6 +1,6 @@
 from django.contrib import admin
 
-from .models import Hit, SearchTerm, Campaign, LIB
+from .models import Hit, LIB
 
 
 class HitModelAdmin(admin.ModelAdmin):
@@ -13,16 +13,8 @@ class HitModelAdmin(admin.ModelAdmin):
 admin.site.register(Hit, HitModelAdmin)
 
 
-class SearchTermModelAdmin(admin.ModelAdmin):
-    list_display = ('value', 'count', 'session', 'slug',)
+class LIBModelAdmin(admin.ModelAdmin):
+    list_display = ('name', 'utm_medium', 'utm_source', 'utm_content', 'is_pinned')
 
 
-admin.site.register(SearchTerm, SearchTermModelAdmin)
-
-
-class CampaignModelAdmin(admin.ModelAdmin):
-    list_display = ('key', 'value', 'ip', 'slug',)
-
-
-admin.site.register(Campaign, CampaignModelAdmin)
-admin.site.register(LIB)
+admin.site.register(LIB, LIBModelAdmin)

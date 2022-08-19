@@ -18,8 +18,11 @@ setup(
     license='',
     packages=find_packages(),
     install_requires=[
-        "django>=4.0.1", 'djangorestframework', 'gunicorn', 'psycopg2-binary',
-        'django-environ', 'requests', 'Pillow', 'beautifulsoup4'
+        "django>=4.0.2", 'djangorestframework', 'django-environ',
+        'gunicorn', 'psycopg2-binary',
+        'requests', 'Pillow', 'beautifulsoup4',
+        # required by analytics
+        'pyyaml', 'ua-parser', 'user-agents'
     ],
     extras_require={
         "dev": [

@@ -6,13 +6,14 @@ from django.utils.translation import gettext_lazy as _
 
 from ...core.models import BaseModelMixin
 
-from .managers import HitManager, HitPublicManager, LIBManager
+from .managers import HitManager, ViewsManager, BotsManager, ErrorsManager, LIBManager
 
 
 def jsondef():
     return dict()
 
-# Link in Bio
+
+# ========================== Link in Bio ==========================
 
 
 class LIB(BaseModelMixin):
@@ -23,13 +24,17 @@ class LIB(BaseModelMixin):
 
     is_pinned = models.BooleanField(_("Is pinned"), default=False)
 
+    #
+    hits = models.ManyToManyField("Hit", verbose_name=_("Hits"), blank=True)
+    #
+
     objects = LIBManager()
 
-    def hits(self):
-        key = f'p/{self.name}'
-        return Hit.objects.filter(
-            models.Q(path__icontains=key) | models.Q(referrer__icontains=key)
-        ).distinct()
+    # def hits(self):
+    #     key = f'p/{self.name}'
+    #     return Hit.objects.filter(
+    #         models.Q(path__icontains=key) | models.Q(referrer__icontains=key)
+    #     ).distinct()
 
     class Meta:
         verbose_name = _('Link in bio')
@@ -39,36 +44,51 @@ class LIB(BaseModelMixin):
     def __str__(self) -> str:
         return f'{self.name}'
 
+#
+# ========================== HITS ==========================
+#
+
 
 class Hit(BaseModelMixin):
     site_id = models.CharField(max_length=500)
 
     # unique identidier, could be a slug for customer, uid for user, etc
     source_id = models.CharField(max_length=500, blank=True, null=True)
-
-    # session key
     app = models.CharField(max_length=300, null=True, blank=True)
     model = models.CharField(max_length=300, null=True, blank=True)
+
+    # session key
     session = models.CharField(max_length=300)
     session_data = models.JSONField(_("Session Data"), default=jsondef)
+
+    #
     url = models.TextField(max_length=500)
     path = models.TextField(max_length=500)
     referrer = models.TextField(blank=True, null=True)
     user_agent = models.TextField(blank=True, null=True)
-
     ip = models.GenericIPAddressField(
         unpack_ipv4=True, verbose_name=_('Ip address'),
         null=True, blank=True)
 
+    #
     method = models.CharField(
         _("Request method"), max_length=50, null=True, blank=True)
     response_status = models.PositiveIntegerField(blank=True, null=True)
     debug = models.BooleanField(default=settings.DEBUG)
 
     #
+    is_bot = models.BooleanField(_('Is bot'), default=False)
+    is_parsed = models.BooleanField(_('Is bot'), default=False)
+    parsed_data = models.JSONField(_("Parsed Data"), default=jsondef)
+
+    # is_keep_track = models.BooleanField(_('Is keep track'), default=False)
+
+    #
 
     objects = HitManager()
-    public = HitPublicManager()
+    views = ViewsManager()
+    bots = BotsManager()
+    errors = ErrorsManager()
 
     def save(self, *args, **kwargs):
         if not self.pk:
@@ -89,28 +109,28 @@ class Hit(BaseModelMixin):
         return f'{self.response_status}: {self.path}'
 
 
-class SearchTerm(BaseModelMixin):
-    session = models.CharField(max_length=300)
-    value = models.CharField(_("Term"), max_length=99)
-    count = models.PositiveIntegerField(_("Count"), default=1)
+# class SearchTerm(BaseModelMixin):
+#     session = models.CharField(max_length=300)
+#     value = models.CharField(_("Term"), max_length=99)
+#     count = models.PositiveIntegerField(_("Count"), default=1)
 
-    class Meta:
-        verbose_name = _('Search Term')
-        verbose_name_plural = _('Search Terms')
-        ordering = ('-updated', '-created',)
+#     class Meta:
+#         verbose_name = _('Search Term')
+#         verbose_name_plural = _('Search Terms')
+#         ordering = ('-updated', '-created',)
 
 
-class Campaign(BaseModelMixin):
-    key = models.CharField(max_length=99)
-    value = models.CharField(_("Term"), max_length=99)
-    ip = models.GenericIPAddressField(
-        unpack_ipv4=True, verbose_name=_('Ip address'),
-        null=True, blank=True)
+# class Campaign(BaseModelMixin):
+#     key = models.CharField(max_length=99)
+#     value = models.CharField(_("Term"), max_length=99)
+#     ip = models.GenericIPAddressField(
+#         unpack_ipv4=True, verbose_name=_('Ip address'),
+#         null=True, blank=True)
 
-    class Meta:
-        verbose_name = _('Campaign')
-        verbose_name_plural = _('Campaigns')
-        ordering = ('-updated', '-created',)
+#     class Meta:
+#         verbose_name = _('Campaign')
+#         verbose_name_plural = _('Campaigns')
+#         ordering = ('-updated', '-created',)
 
 
 # class HitRangeUnit(models.TextChoices):
