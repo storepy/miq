@@ -75,7 +75,7 @@ def parse_ua(user_agent: str):
 
 
 def parse_hit_data(url, referrer, user_agent, session_data):
-    assert url and referrer and user_agent and session_data
+    assert url
     assert isinstance(session_data, dict), logerr('Session data must be a dict')
 
     parsed = {}
@@ -90,7 +90,7 @@ def parse_hit_data(url, referrer, user_agent, session_data):
 
     parsed = {key: ','.join(value) if type(value) is list else value for key, value in parsed.items()}
 
-    if ua_data := parse_ua(user_agent):
+    if isinstance(user_agent, str) and (ua_data := parse_ua(user_agent)):
         parsed.update(ua_data)
     return parsed
 
