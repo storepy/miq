@@ -16,11 +16,28 @@ from ...core.models import BaseManagerMixin
 
 
 class DateQsMixin(BaseManagerMixin):
+
     def today(self):
         self.created_today()
 
     def yesterday(self):
         self.created_yesterday()
+
+
+class AnalyticsMixin:
+    def sent_message(self):
+        return self.filter(parsed_data__r__isnull=False)
+
+    def paths_by_ips(self):
+        return self.values('path', 'ip').annotate(count=Count('ip')).order_by('-count')
+
+    def by_paths(self):
+        return self.values('path').annotate(count=Count('ip'))\
+            .exclude(count=0).order_by('-count')
+
+    def by_ips(self):
+        return self.values('ip').annotate(count=Count('ip'))\
+            .order_by('-count')
 
 
 class LIBQueryset(DateQsMixin, models.QuerySet):
@@ -52,7 +69,7 @@ class LIBManager(models.Manager):
         return LIBQueryset(self.model, *args, using=self._db, **kwargs)
 
 
-class HitQueryset(DateQsMixin, models.QuerySet):
+class HitQueryset(DateQsMixin, AnalyticsMixin, models.QuerySet):
 
     def key_by_created_date(self, key: str, order_by='-created__date'):
         return self.values('created__date', 'path', key)\
