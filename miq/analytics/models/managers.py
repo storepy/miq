@@ -17,11 +17,17 @@ from ...core.models import BaseManagerMixin
 
 class DateQsMixin(BaseManagerMixin):
 
+    def last_7_days(self):
+        return self.get_last_n_days(7)
+
+    def last_30_days(self):
+        return self.get_last_n_days(30)
+
     def today(self):
-        self.created_today()
+        return self.created_today()
 
     def yesterday(self):
-        self.created_yesterday()
+        return self.created_yesterday()
 
 
 class AnalyticsMixin:
