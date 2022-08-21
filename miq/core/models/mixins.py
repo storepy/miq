@@ -33,9 +33,10 @@ class BaseDateQsMixin:
 
     def get_last_n_days(self, days_count: int):
         day = date.today() - datetime.timedelta(days=days_count)
-        return self.filter(
-            created__day__gte=day.day, created__year__gte=day.year,
-            created__month__gte=day.month).order_by('-created')
+        return self.filter(created__gte=day).order_by('-created')
+        # return self.filter(
+        #     created__day__gte=day.day, created__year__gte=day.year,
+        #     created__month__gte=day.month).order_by('-created')
 
 
 class BaseManagerMixin(BaseDateQsMixin):
