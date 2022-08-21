@@ -21,7 +21,6 @@ class TestCorePageView(Mixin, TestCase):
         path = self.get_detail_path(page.slug)
         r = self.client.get(path)
         self.assertEqual(r.context.get('title'), title)
-        # print()
 
     def test_published(self):
         page = Page.objects.create(label='about', site=self.site)

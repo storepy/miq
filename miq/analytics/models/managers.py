@@ -56,7 +56,7 @@ class LIBQueryset(DateQsMixin, models.QuerySet):
         from miq.analytics.models import Hit
         libQs = self.add_path()
 
-        print(libQs.values_list('name', flat=True))
+        # print(libQs.values_list('name', flat=True))
         qs = Hit.objects.filter(
             # models.Q(path__in=libQs.values_list('path', flat=True))
             # |libQs.values_list('name', flat=True)
@@ -65,8 +65,6 @@ class LIBQueryset(DateQsMixin, models.QuerySet):
 
             # | models.Q(session_data__query__utm_campaign__in=libQs.values_list('name', flat=True))
         ).distinct()
-        print(qs.count())
-        # print(qs[0])
         return self
 
 

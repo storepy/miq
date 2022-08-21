@@ -66,7 +66,6 @@ def get_ig_username_media(data: dict):
     if media := get_dict_key(data, 'graphql__user__edge_owner_to_timeline_media'):
         for m in media.get('edges', []):
             m = m['node']
-            print(m.get('display_url'))
             if (u := m.get('display_url')) and (img := download_img_from_url_to_b64(u, s=s, headers=headers, cookies=cookies)):
                 m['display_url'] = img
 
@@ -83,8 +82,6 @@ def get_ig_username_info(username: str, s=s):
 
     if r.status_code == 404:
         return
-
-    # print(r.text)
 
     data = {}
     try:

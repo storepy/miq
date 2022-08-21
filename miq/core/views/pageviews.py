@@ -22,7 +22,6 @@ class SettingPageViewMixin(DetailView):
 
         field = f'{self.field_html}' or f'{self.field}_html'
         self.content = getattr(obj, f'{field}', getattr(obj, self.field, None))
-        print(self.content)
         if not self.content:
             raise Http404('Content not found')
         return super().dispatch(request, *args, **kwargs)

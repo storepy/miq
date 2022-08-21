@@ -26,12 +26,12 @@ class Command(BaseCommand):
 
         _qs = qs.values('created__date', 'ip').annotate(count=Count('ip'))\
             .order_by('-count')
-        pprint([*_qs[:10]])
+        # pprint([*_qs[:10]])
 
         import datetime
         dt = datetime.date(2022, 8, 9)
         qs = qs.filter(created__date=dt, path='/api/v1/carts/c8ab2afa-750e-4b93-aae0-21f8a1c15fa3/')
-        print(qs.count())
+        # print(qs.count())
         return
 
         by_count = qs.values('url', 'ip', 'referrer', 'user_agent', 'path')\

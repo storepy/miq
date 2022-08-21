@@ -13,8 +13,6 @@ from miq.tests.mixins import TestMixin
 TEST_MEDIA_DIR = 'test_media'
 list_path = reverse_lazy('miq:image-list')
 
-print(list_path)
-
 
 class Mixin(TestMixin):
     pass
