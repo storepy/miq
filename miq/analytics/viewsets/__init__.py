@@ -1,5 +1,8 @@
 # import logging
 
+# import re
+# from django.db.models import Q
+# from pprint import pprint
 from django.db import models
 # from django.utils.translation import gettext_lazy as _
 
@@ -105,7 +108,8 @@ class LIBViewset(Mixin):
             self.request,
             qs=Hit.objects.filter(
                 models.Q(path__icontains=f'{obj.name}')
-                | models.Q(session_data__query__utm_campaign=[obj.name])
+                | models.Q(referrer__icontains=obj.name)
+                | models.Q(parsed_data__utm_campaign=obj.name)
             ).distinct()
         )
         queryset = self.filter_queryset(qs)
@@ -128,29 +132,32 @@ class LIBViewset(Mixin):
         return qs
 
 
-# class CampaignViewset(Mixin):
-#     queryset = Campaign.objects.all()
-#     serializer_class = CampaignSerializer
+# name = 'tkshop'
+# name = 'igshop'
+# # name = 'profile'
+# qs = Hit.objects.filter(
+#     models.Q(path__icontains=name)
+#     | models.Q(referrer__icontains=name)
+#     | models.Q(parsed_data__utm_campaign=name)
+# ).distinct()
 
-#     def get_serializer_class(self):
-#         if self.is_summary():
-#             return CampaignSummarySerializer
-#         return super().get_serializer_class()
+# qs = Hit.objects.filter(
+#     Q(user_agent__icontains='fb')
+#     | Q(user_agent__icontains='ig')
+#     | Q(user_agent__icontains='facebook')
+#     | Q(user_agent__icontains='instagram')
+# ).distinct()
 
-#     def get_queryset(self):
-#         qs = super().get_queryset()
-#         # params = self.request.query_params
-#         if self.is_summary():
-#             qs = qs.values('key', 'value')\
-#                 .annotate(count=models.Count('ip'))\
-#                 .order_by('-count')
+# qs = Hit.objects.filter(user_agent__icontains='mobile').values(
+#     'user_agent', 'parsed_data__is_mobile').annotate(c=models.Count('user_agent')).order_by('-c')
 
-#         return qs
+# print(qs.count(), qs.paths_by_ips().count(), qs.by_paths().count(), qs.by_uas().count())
+# pprint(list(qs.by_uas())[:10])
+# pprint(list(qs)[:10])
 
-#     def is_summary(self) -> bool:
-#         return self.request.query_params.get('summary') == '1'
+# u = 'mozilla/5.0 (android 10; mobile; rv:102.0) gecko/102.0 firefox/102.0'
+# s = 'ip(hone|od)|android.+mobile|windows (ce|phone)|blackberry|bb10|symbian|webos|firefox.+fennec|opera m(ob|in)i|tizen.+mobile|polaris|iemobile|lgtelecom|nokia|sonyericsson|dolfin|uzard|natebrowser|ktf;|skt;'
+# m = re.search(s, qs[10].get('user_agent'))
+# print(m)
 
-
-# class SearchViewset(Mixin):
-#     queryset = SearchTerm.objects.all()
-#     serializer_class = SearchTermSerializer
+#

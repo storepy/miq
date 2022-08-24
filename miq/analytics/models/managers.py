@@ -20,8 +20,17 @@ class DateQsMixin(BaseManagerMixin):
     def last_7_days(self):
         return self.get_last_n_days(7)
 
+    def last_14_days(self):
+        return self.get_last_n_days(14)
+
     def last_30_days(self):
         return self.get_last_n_days(30)
+
+    def last_60_days(self):
+        return self.get_last_n_days(60)
+
+    def last_90_days(self):
+        return self.get_last_n_days(90)
 
     def today(self):
         return self.created_today()
@@ -37,12 +46,25 @@ class AnalyticsMixin:
     def paths_by_ips(self):
         return self.values('path', 'ip').annotate(count=Count('ip')).order_by('-count')
 
+    def paths_by_uas(self):
+        return self.values('path', 'user_agent').annotate(count=Count('user_agent'))\
+            .order_by('-count')
+
     def by_paths(self):
         return self.values('path').annotate(count=Count('ip'))\
             .exclude(count=0).order_by('-count')
 
+    def count_by_created_date(self):
+        return self.values('created__date').annotate(count=Count('ip'))\
+            .order_by('-created__date')
+
     def by_ips(self):
         return self.values('ip').annotate(count=Count('ip'))\
+            .order_by('-count')
+
+    def by_uas(self):
+        """ Group by user agents """
+        return self.values('user_agent').annotate(count=Count('user_agent'))\
             .order_by('-count')
 
 
@@ -51,21 +73,6 @@ class LIBQueryset(DateQsMixin, models.QuerySet):
         return self.annotate(
             path=Concat(V('/p/'), 'name', V('/'), output_field=models.SlugField())
         )
-
-    def with_hits(self):
-        from miq.analytics.models import Hit
-        libQs = self.add_path()
-
-        # print(libQs.values_list('name', flat=True))
-        qs = Hit.objects.filter(
-            # models.Q(path__in=libQs.values_list('path', flat=True))
-            # |libQs.values_list('name', flat=True)
-            models.Q(session_data__query__utm_campaign__contains__in=['igshop', 'catly', 'cataly', 'cata', 'analy'])
-            # models.Q(session_data__query__utm_campaign__contains=['cataly'])
-
-            # | models.Q(session_data__query__utm_campaign__in=libQs.values_list('name', flat=True))
-        ).distinct()
-        return self
 
 
 class LIBManager(models.Manager):

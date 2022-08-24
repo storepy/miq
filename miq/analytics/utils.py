@@ -116,12 +116,12 @@ def parse_hits():
 
 def create_hit(request, response, /, source: str = None) -> Hit:
     if request.method == 'OPTIONS':
-        loginfo('skip option hit creation')
+        logger.debug('skip option hit creation')
         return
 
     for match in exclude:
         if match in request.path:
-            loginfo(f'skip match: {match} hit creation')
+            logger.debug(f'skip match: {match} hit creation')
             return
 
     if not request.session.session_key:

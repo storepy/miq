@@ -1,6 +1,7 @@
 import datetime
 from uuid import uuid4
 from datetime import date
+from django.utils import timezone
 
 from django.db import models
 from django.utils.translation import gettext_lazy as _
@@ -9,30 +10,32 @@ from django.utils.translation import gettext_lazy as _
 class BaseDateQsMixin:
     def updated_today(self):
         today = date.today()
+        today = timezone.now()
         return self.filter(
             updated__day=today.day, updated__year=today.year,
             updated__month=today.month).order_by('-updated')
 
     def updated_yesterday(self):
-        yst = date.today() - datetime.timedelta(1)
+        yst = timezone.now() - datetime.timedelta(1)
         return self.filter(
             updated__day=yst.day, updated__year=yst.year,
             updated__month=yst.month).order_by('-updated')
 
     def created_today(self):
         today = date.today()
+        today = timezone.now()
         return self.filter(
             created__day=today.day, created__year=today.year,
             created__month=today.month).order_by('-created')
 
     def created_yesterday(self):
-        yst = date.today() - datetime.timedelta(1)
+        yst = timezone.now() - datetime.timedelta(1)
         return self.filter(
             created__day=yst.day, created__year=yst.year,
             created__month=yst.month).order_by('-created')
 
     def get_last_n_days(self, days_count: int):
-        day = date.today() - datetime.timedelta(days=days_count)
+        day = timezone.now() - datetime.timedelta(days=days_count)
         return self.filter(created__gte=day).order_by('-created')
         # return self.filter(
         #     created__day__gte=day.day, created__year__gte=day.year,
