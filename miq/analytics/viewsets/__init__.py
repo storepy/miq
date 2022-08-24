@@ -124,10 +124,10 @@ class LIBViewset(Mixin):
 
     def get_queryset(self):
         qs = super().get_queryset()
-        params = self.request.query_params
-        summary = params.get('summary')
-        if summary:
-            qs = qs.with_hits()
+        # params = self.request.query_params
+        # summary = params.get('summary')
+        # if summary:
+        #     qs = qs.with_hits()
 
         return qs
 
