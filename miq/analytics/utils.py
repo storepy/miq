@@ -199,9 +199,14 @@ def create_hit(request, response, /, source: str = None) -> Hit:
     if source:
         data.update({'source_id': source})
 
-    cached_query = request.session.get(cached_query_key) or {}
+    cached_query = {
+        key: value for key, value in request.session.get(cached_query_key, {}).items()
+        if key not in ['r']
+    } or {}
+
     query = {**cached_query, **parse_qs(urlparse(url).query)}
     if query:
+        query = {key: value for key, value in query.items() if not key.startswith('__')}
         request.session.update({cached_query_key: query})
         data['session_data'].update({'query': query})
 

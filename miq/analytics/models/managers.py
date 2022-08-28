@@ -41,18 +41,29 @@ class DateQsMixin(BaseManagerMixin):
 
 class AnalyticsMixin:
     def sent_message(self):
-        return self.filter(parsed_data__r__isnull=False)
+        return self.filter(parsed_data__r='1')
 
     def paths_by_ips(self):
         return self.values('path', 'ip').annotate(count=Count('ip')).order_by('-count')
 
+    def by_paths(self):
+        """
+        Unique number of hits for each path by ip.
+        """
+        return self.values('path').annotate(count=Count('ip'))\
+            .exclude(count=0).order_by('-count')
+
+    def paths_count(self):
+        """
+        Total number of hits for each path.
+        Similar to running self.filter(path='/path/name/').count()
+        """
+        return self.values('path')\
+            .annotate(count=Count('path')).order_by('-count')
+
     def paths_by_uas(self):
         return self.values('path', 'user_agent').annotate(count=Count('user_agent'))\
             .order_by('-count')
-
-    def by_paths(self):
-        return self.values('path').annotate(count=Count('ip'))\
-            .exclude(count=0).order_by('-count')
 
     def count_by_created_date(self):
         return self.values('created__date').annotate(count=Count('ip'))\

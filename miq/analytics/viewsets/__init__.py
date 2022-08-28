@@ -54,10 +54,13 @@ def get_hit_qs(request, *, qs=Hit.views.all()):
         qs = qs.filter(referrer=ref)
     if ip := params.get('__ip'):
         qs = qs.filter(ip=ip)
+    if params.get('__msg') == '1':
+        # qs = qs.filter(response_status=302)
+        qs = qs.filter(parsed_data__r='1')
+        # parsed_data__r='1'
 
     if status := params.get('__status'):
         qs = qs.filter(response_status=int(status))
-
     if ua := params.get('__ua'):
         qs = qs.filter(user_agent=ua)
 
@@ -121,15 +124,6 @@ class LIBViewset(Mixin):
 
         serializer = HitSerializer(queryset, many=True)
         return Response(serializer.data)
-
-    def get_queryset(self):
-        qs = super().get_queryset()
-        # params = self.request.query_params
-        # summary = params.get('summary')
-        # if summary:
-        #     qs = qs.with_hits()
-
-        return qs
 
 
 # name = 'tkshop'
