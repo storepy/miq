@@ -3,6 +3,7 @@ from django.utils.translation import gettext_lazy as _
 from django.contrib.sites.shortcuts import get_current_site
 
 from rest_framework.response import Response
+from rest_framework.decorators import action
 from rest_framework import viewsets, status, serializers
 from rest_framework.parsers import JSONParser, MultiPartParser
 
@@ -23,6 +24,25 @@ class ImageViewset(LoginRequiredMixin, viewsets.ModelViewSet):
     queryset = Image.objects.none()
     parser_classes = (JSONParser, MultiPartParser)
     serializer_class = ImageSerializer
+
+    @action(methods=['patch'], detail=True)
+    def swap_position(self, request, *args, **kwargs):
+        obj = self.get_object()
+        data = request.data
+
+        to = Image.objects.filter(slug=data.get('slug')).first()
+        if not to:
+            raise serializers.ValidationError({'slug': 'Image not found'})
+
+        obj_pos = obj.position
+        obj.position = data.get('position', to.position)
+        if obj.position != obj_pos:
+            obj.save()
+        if to.position != obj_pos:
+            to.position = obj_pos
+            to.save()
+
+        return Response({'from': ImageSerializer(to).data, 'to': ImageSerializer(obj).data})
 
     def create(self, request, *args, **kwargs):
         data = request.data
