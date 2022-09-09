@@ -165,13 +165,13 @@ def create_hit(request, response, /, source: str = None) -> Hit:
 
     if cart := request.session.get(cart_key):
         data['session_data'][cart_key] = cart
-        loginfo(f'added cart slug to session[{session}] data')
+        logger.debug(f'added cart slug to session[{session}] data')
 
     # CUSTOMER
 
     if cus := request.session.get(cus_key):
         data['session_data'][cus_key] = cus
-        loginfo(f'added customer slug to session[{session}] data')
+        logger.debug(f'added customer slug to session[{session}] data')
 
     source = source or request.session.get('source')
 

@@ -19,18 +19,13 @@ class Command(BaseCommand):
         if (site := Site.objects.first()) and not hasattr(site, 'settings'):
             site.save()
 
-        # print(settings.BUILD_DIR, '\n')
-
-        # if not os.path.isdir(settings.BUILD_DIR):
-        #     raise Exception('No build directory')
-
         client_dir = getattr(settings, 'CLIENT_DIR', 'client')
         if not os.path.isdir(client_dir):
             self.stdout.write(self.style.ERROR('No client directory found'))
-            return
+            raise Exception('No client directory')
 
         self.stdout.write('Building client app ...')
-        subprocess.run(['yarn', 'build'], cwd=client_dir)
+        subprocess.run(['yarn', 'build'], cwd=client_dir, check=True)
 
         if not os.path.isdir(settings.BUILD_DIR):
             raise Exception('No build directory')
