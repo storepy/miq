@@ -11,6 +11,12 @@ from .models.setting import SiteSetting
 local = threading.local()
 
 
+def set_current(request):
+    setattr(local, 'site', get_current_site(request))
+    setattr(local, 'request', request)
+    setattr(local, 'user', request.user)
+
+
 class SiteMiddleware(CurrentSiteMiddleware):
     def __init__(self, get_response):
         self.get_response = get_response
@@ -23,9 +29,8 @@ class SiteMiddleware(CurrentSiteMiddleware):
         return response
 
     def process_request(self, request):
-        site = get_current_site(request)
-        request.site = site
-        local.site = site
+        request.site = get_current_site(request)
+        set_current(request)
 
     def process_view(self, request, view_func, view_args, view_kwargs):
         pass

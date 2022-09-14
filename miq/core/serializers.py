@@ -4,6 +4,36 @@ from rest_framework import serializers
 from .models import Image
 
 
+def get_img_serializer_class(extra_fields=(), extra_ro_fields=()):
+    ro_fields = (*extra_ro_fields,)
+    fields = (
+        'src', 'src_mobile', 'thumb', 'thumb_sq', 'alt_text',
+        # 'caption',
+        *extra_fields, *ro_fields,)
+
+    props = {
+        'Meta': type('Meta', (), {
+            'model': Image,
+            'fields': fields,
+            'read_only_fields': ro_fields,
+        }),
+    }
+
+    if 'user' in fields:
+        props['user'] = serializers.SlugRelatedField(slug_field="slug", read_only=True)
+
+    # if 'width' in extra_ro_fields:
+    #     props['width'] = serializers.ReadOnlyField()
+    # if 'height' in extra_ro_fields:
+    #     props['height'] = serializers.ReadOnlyField()
+    # if 'width_mobile' in extra_ro_fields:
+    #     props['width_mobile'] = serializers.ReadOnlyField()
+    # if 'height_mobile' in extra_ro_fields:
+    #     props['height_mobile'] = serializers.ReadOnlyField()
+
+    return type('ImageSerializer', (serializers.ModelSerializer,), props)
+
+
 def serialize_context_pagination(request, context):
     is_paginated = context.get('is_paginated', False)
 
