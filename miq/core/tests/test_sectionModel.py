@@ -1,6 +1,6 @@
 from django.test import TransactionTestCase
 
-from miq.tests.mixins import TestMixin
+from miq.core.tests.utils import TestMixin
 from miq.core.models import Section, TextSection, MarkdownSection, ImageSection
 
 

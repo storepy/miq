@@ -138,6 +138,8 @@ def create_hit(request, response, /, source: str = None) -> Hit:
         or request.path_info \
         or request.path
 
+    # raise Exception('url', url)
+
     #
     ip = get_ip(request)
     session = request.session.session_key
@@ -215,6 +217,7 @@ def create_hit(request, response, /, source: str = None) -> Hit:
         method=method, site_id=site_id, response_status=status,
         created__gt=timezone.now() - datetime.timedelta(minutes=1),
     )
+
     if last.exists() and (hit := last.order_by('-created').first()):
         # hit.count += 1
         hit.session_data = {**hit.session_data, **data}

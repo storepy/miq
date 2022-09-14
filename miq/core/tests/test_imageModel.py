@@ -4,8 +4,8 @@ from django.test import TransactionTestCase
 
 from miq.core.models import Image
 
-from miq.tests.mixins import TestMixin
-from miq.tests.utils import get_temp_img
+
+from miq.core.tests.utils import TestMixin, get_temp_img
 
 TEST_MEDIA_DIR = 'test_media'
 

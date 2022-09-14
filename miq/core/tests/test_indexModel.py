@@ -4,7 +4,7 @@ from django.test import TransactionTestCase
 
 from miq.core.models import Index
 
-from miq.tests.mixins import TestMixin
+from miq.core.tests.utils import TestMixin
 
 
 class Mixin(TestMixin):

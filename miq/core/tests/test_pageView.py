@@ -2,7 +2,7 @@ from django.test import TestCase
 from django.urls import reverse_lazy
 
 from miq.core.models import Page
-from miq.tests.mixins import TestMixin
+from miq.core.tests.utils import TestMixin
 
 
 class Mixin(TestMixin):

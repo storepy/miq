@@ -1,7 +1,7 @@
 
 from django.test import TransactionTestCase
 
-from miq.tests.mixins import UserMixin
+from miq.core.tests.utils import UserMixin
 
 
 class TestCoreUser(UserMixin, TransactionTestCase):

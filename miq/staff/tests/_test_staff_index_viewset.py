@@ -6,7 +6,7 @@ from rest_framework.test import APITestCase
 
 from miq.core.models import Section
 
-from miq.tests.mixins import TestMixin
+from miq.core.tests.utils import TestMixin
 
 path = reverse_lazy('miq:index-detail', args=['current'])
 

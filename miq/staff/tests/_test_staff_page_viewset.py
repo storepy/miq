@@ -5,7 +5,7 @@ from rest_framework.test import APITestCase
 
 from miq.core.models import Page, Section
 
-from miq.tests.mixins import TestMixin
+from miq.core.tests.utils import TestMixin
 
 list_path = reverse_lazy('miq:page-list')
 

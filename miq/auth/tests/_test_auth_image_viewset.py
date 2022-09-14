@@ -5,10 +5,10 @@ from django.test import override_settings
 from rest_framework import status
 from rest_framework.test import APITestCase
 
-from miq.models import Image
-from miq.tests.utils import get_temp_img
+from miq.core.models import Image
+from miq.core.tests.utils import get_temp_img
 
-from miq.tests.mixins import TestMixin
+from miq.core.tests.utils.mixins import TestMixin
 
 TEST_MEDIA_DIR = 'test_media'
 list_path = reverse_lazy('miq:image-list')

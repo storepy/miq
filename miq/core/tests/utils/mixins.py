@@ -1,3 +1,4 @@
+from django.urls import reverse_lazy
 from django.contrib.sites.models import Site
 from django.contrib.auth import get_user_model
 from django.contrib.auth.models import Permission
@@ -80,4 +81,5 @@ class SiteMixin:
 
 
 class TestMixin(SiteMixin, UserMixin):
-    pass
+    def get_staff_img_list_path(self):
+        return reverse_lazy('staff:staffimage-list')

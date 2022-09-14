@@ -1,6 +1,6 @@
 from pathlib import Path
 from django.urls import reverse_lazy
-from miq.config import (
+from miq.core.config import (
     AUTH_USER_MODEL,
 )
 
@@ -26,18 +26,28 @@ INSTALLED_APPS = [
     'django.contrib.sitemaps',
     #
     'rest_framework',
-    'miq.apps.MiqConfig',
+    #
+
+    'miq.core',
+    'miq.staff',
+    'miq.analytics',
 ]
 
 ROOT_URLCONF = 'tests.urls'
 
 DATABASES = {
     'default': {
-        'ENGINE': 'django.db.backends.sqlite3',
+        # 'ENGINE': 'django.db.backends.sqlite3',
+        'ENGINE': 'django.db.backends.postgresql_psycopg2',
+        # 'NAME': 'test_mydb',
+        # 'USER': 'myuser',
+        # 'PASSWORD': 'mypassword',
+        # 'HOST': '',
+        # 'PORT': '',
     },
-    'other': {
-        'ENGINE': 'django.db.backends.sqlite3',
-    }
+    # 'other': {
+    #     'ENGINE': 'django.db.backends.sqlite3',
+    # }
 }
 
 # DATABASES = {
@@ -53,7 +63,7 @@ DATABASES = {
 
 MIDDLEWARE = [
     # CORS
-    'miq.middleware.CORSMiddleware',
+    'miq.core.middleware.CORSMiddleware',
     #
     'django.middleware.security.SecurityMiddleware',
     'django.contrib.sessions.middleware.SessionMiddleware',
@@ -62,6 +72,10 @@ MIDDLEWARE = [
     'django.contrib.auth.middleware.AuthenticationMiddleware',
     'django.contrib.messages.middleware.MessageMiddleware',
     'django.middleware.clickjacking.XFrameOptionsMiddleware',
+
+    #
+    'miq.core.middleware.SiteMiddleware',
+    'miq.analytics.middlewares.AnalyticsMiddleware',
 ]
 
 

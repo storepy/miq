@@ -15,7 +15,12 @@ python -m pytest
 
 ```
 coverage run -m pytest
-coverage run -m pytest tests/auth/test_auth_image_viewset.py::TestImageViewset::test_create
+
+<!-- run specific test -->
+coverage run -m pytest analytics/tests/test_hit.py::TestHitModel::test_create_hit
+
+<!-- ignore a directory -->
+coverage run -m pytest --ignore miq/staff
 
 coverage html
 ```

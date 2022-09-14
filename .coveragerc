@@ -1,3 +1,12 @@
 [run]
 source = .
-omit = */env/*, */miqenv/*, */tests/*, */migrations/*, */urls.py, */settings/*, */wsgi.py, */asgi.py, manage.py, fabfile.py
+omit = */env/*
+    */miqenv/*
+    */tests/*
+    */migrations/*
+    */urls.py
+    */settings/*
+    */wsgi.py
+    */asgi.py
+    manage.py
+    fabfile.py

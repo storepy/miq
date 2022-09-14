@@ -1,11 +1,11 @@
 
-from django.contrib.sites.models import Site
+# from django.contrib.sites.models import Site
 
 from django.test import TransactionTestCase
 
 
-from miq.models import Page
-from miq.tests.mixins import TestMixin
+from miq.core.models import Page
+from miq.core.tests.utils import TestMixin
 
 
 class Mixin(TestMixin):
