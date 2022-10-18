@@ -1,7 +1,7 @@
 
 from django.db import models
 from django.conf import settings
-
+from django.contrib.auth import get_user_model
 from django.utils.translation import gettext_lazy as _
 
 from ...core.models import BaseModelMixin
@@ -12,6 +12,8 @@ from .managers import HitManager, ViewsManager, BotsManager, ErrorsManager, LIBM
 def jsondef():
     return dict()
 
+
+User = get_user_model()
 
 # ========================== Link in Bio ==========================
 
@@ -49,8 +51,38 @@ class LIB(BaseModelMixin):
 #
 
 
-class Hit(BaseModelMixin):
+class AbstractVisitor(BaseModelMixin):
+
+    user_agent = models.TextField(blank=True, null=True)
+    ip = models.GenericIPAddressField(
+        unpack_ipv4=True, verbose_name=_('Ip address'),
+        null=True, blank=True)
+
+    class Meta:
+        abstract = True
+        ordering = ('-created', '-updated',)
+
+
+class Visitor(AbstractVisitor):
+    user = models.ForeignKey(
+        User, on_delete=models.SET_NULL,
+        related_name='visitors', blank=True, null=True)
+
+    is_bot = models.BooleanField(_('Is bot'), default=False)
+
+    class Meta:
+        verbose_name = _('Visitor')
+        verbose_name_plural = _('Visitors')
+        ordering = ('-updated', '-created')
+
+    def __str__(self) -> str:
+        return f'{self.ip}'
+
+
+class Hit(AbstractVisitor):
     site_id = models.CharField(max_length=500)
+
+    visitor = models.ForeignKey("Visitor", verbose_name=_("Visitor"), on_delete=models.SET_NULL, null=True, blank=True)
 
     # unique identidier, could be a slug for customer, uid for user, etc
     source_id = models.CharField(max_length=500, blank=True, null=True)
@@ -65,10 +97,12 @@ class Hit(BaseModelMixin):
     url = models.TextField(max_length=500)
     path = models.TextField(max_length=500)
     referrer = models.TextField(blank=True, null=True)
-    user_agent = models.TextField(blank=True, null=True)
-    ip = models.GenericIPAddressField(
-        unpack_ipv4=True, verbose_name=_('Ip address'),
-        null=True, blank=True)
+
+    # # visitor
+    # user_agent = models.TextField(blank=True, null=True)
+    # ip = models.GenericIPAddressField(
+    #     unpack_ipv4=True, verbose_name=_('Ip address'),
+    #     null=True, blank=True)
 
     #
     method = models.CharField(
@@ -78,10 +112,8 @@ class Hit(BaseModelMixin):
 
     #
     is_bot = models.BooleanField(_('Is bot'), default=False)
-    is_parsed = models.BooleanField(_('Is bot'), default=False)
+    is_parsed = models.BooleanField(_('Is parsed'), default=False)
     parsed_data = models.JSONField(_("Parsed Data"), default=jsondef)
-
-    # is_keep_track = models.BooleanField(_('Is keep track'), default=False)
 
     #
 
@@ -91,6 +123,7 @@ class Hit(BaseModelMixin):
     errors = ErrorsManager()
 
     def save(self, *args, **kwargs):
+        is_new = self.pk is None
         if not self.pk:
             if self.referrer:
                 self.referrer = self.referrer.lower()
@@ -98,7 +131,13 @@ class Hit(BaseModelMixin):
             if self.user_agent:
                 self.user_agent = self.user_agent.lower()
 
-        return super().save(*args, **kwargs)
+        super().save(*args, **kwargs)
+
+        if is_new and self.is_bot:
+            try:
+                Bot.objects.get_or_create(ip=self.ip, user_agent=self.user_agent)
+            except Exception:
+                pass
 
     class Meta:
         ordering = ('-created', '-updated',)
@@ -109,58 +148,11 @@ class Hit(BaseModelMixin):
         return f'{self.response_status}: {self.path}'
 
 
-# class SearchTerm(BaseModelMixin):
-#     session = models.CharField(max_length=300)
-#     value = models.CharField(_("Term"), max_length=99)
-#     count = models.PositiveIntegerField(_("Count"), default=1)
+class Bot(AbstractVisitor):
+    class Meta:
+        verbose_name = _('Bot')
+        verbose_name_plural = _('Bot')
+        ordering = ('-created', '-updated')
 
-#     class Meta:
-#         verbose_name = _('Search Term')
-#         verbose_name_plural = _('Search Terms')
-#         ordering = ('-updated', '-created',)
-
-
-# class Campaign(BaseModelMixin):
-#     key = models.CharField(max_length=99)
-#     value = models.CharField(_("Term"), max_length=99)
-#     ip = models.GenericIPAddressField(
-#         unpack_ipv4=True, verbose_name=_('Ip address'),
-#         null=True, blank=True)
-
-#     class Meta:
-#         verbose_name = _('Campaign')
-#         verbose_name_plural = _('Campaigns')
-#         ordering = ('-updated', '-created',)
-
-
-# class HitRangeUnit(models.TextChoices):
-#     HOUR = 'HOUR', _('Hour')
-#     DAY = 'DAY', _('Day')
-#     WEEK = 'DAY', _('Day')
-#     MONTH = 'DAY', _('Day')
-#     YEAR = 'YEAR', _('Year')
-
-
-# class HitRange:
-#     unit = models.CharField(
-# _("Type"), choices=HitRangeUnit.choices max_length=10)
-#     unit_count = models.PositiveIntegerField(_("Unit count"), default=1)
-#     start_dt = models.DateTimeField(_("Starts at"),)
-#     end_dt = models.DateTimeField(_("Ends at"),)
-#     hits = models.ManyToManyField(
-# "Hit", verbose_name=_("Hits"), reverse_name="ranges")
-
-
-# class IpAddress(models.Model):
-#     class Meta:
-#         ordering = ('value', )
-#         verbose_name = _('IP Address')
-#         verbose_name_plural = _('IP Addresses')
-
-#     def __str__(self):
-#         return f'{self.value}'
-
-#     value = models.GenericIPAddressField(
-#         unpack_ipv4=True, null=True,
-#         verbose_name=_('Ip address'), blank=True)
-#     is_blacklisted = models.BooleanField(default=False)
+    def __str__(self) -> str:
+        return f'{self.ip}'

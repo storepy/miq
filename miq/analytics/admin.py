@@ -1,6 +1,6 @@
 from django.contrib import admin
 
-from .models import Hit, LIB
+from .models import Hit, LIB, Visitor, Bot
 
 
 class HitModelAdmin(admin.ModelAdmin):
@@ -18,3 +18,7 @@ class LIBModelAdmin(admin.ModelAdmin):
 
 
 admin.site.register(LIB, LIBModelAdmin)
+
+
+admin.site.register(Visitor)
+admin.site.register(Bot)

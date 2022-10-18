@@ -1,9 +1,11 @@
 import base64
-from collections import namedtuple
 import os
+import json
 import requests
 import logging
+
 from io import BytesIO
+from collections import namedtuple
 
 from django.apps import apps
 from django.utils import timezone
@@ -142,7 +144,7 @@ def create_staffuser(username, password, **kwargs):
 
     user = User.objects.create_user(username=username, **kwargs, is_staff=True)
     user.set_password(password)
-    assert user.is_staff == True
+    assert user.is_staff is True
     return user
 
 
@@ -192,6 +194,25 @@ def get_ip(request):
     except Exception:
         ip = None
     return ip
+
+
+def get_request_url(request) -> str:
+    return request.build_absolute_uri() \
+        or request.get_full_path_info() \
+        or request.get_full_path() \
+        or request.path_info \
+        or request.path
+
+
+def request_body_to_dict(request) -> dict:
+    """
+    Convert request body to dict
+    """
+
+    try:
+        return json.loads(request.body)
+    except Exception:
+        return {}
 
 
 def dict_to_tuple(name: str, data: dict):

@@ -1,0 +1,86 @@
+
+# from collections import namedtuple
+
+# Path = namedtuple('Path', ['name', 'path'])
+
+
+PATHS = list({
+    # 'admin/login/',
+
+    'login.php',
+    'admin/',
+    'myadmin/',
+    'adm/login/',
+    'admin.php',
+    'netcat/',
+    'manager/',
+    'administrator/index.php',
+
+    'users/sign_in/',
+    'member/login/',
+
+    # WORDPRESS
+    'wp-login/',
+    'wp-login.php',
+    'wp/wp-login.php',
+    'wordpress/wp-login.php',
+    'wp-admin/',
+    'wp-admin.php',
+    'wp-config.php',
+    'wp-config.php~',
+    'wp-config.txt',
+    'wp-config.inc',
+    'wp-config.old',
+    'wp-config.php.dist',
+    'wp-config.php.bak',
+    'wp-config.php.txt',
+    'wp-config.php.old',
+    'wp-config.php.inc',
+    'wp-configer.php',
+    'wp-wso.php',
+    'blog/wp-login.php',
+
+    # PHPMYADMIN
+    'phpmyadmin/',
+    'phpmyadmin/index.php',
+    'mysql/',
+    'mysqladmin/',
+
+
+    'db',
+    '.env',
+    'core/.env',
+    '.env/config/',
+    'env/config/',
+    '.index.env',
+    '.credentials.php',
+    '.aws.credentials',
+    '.aws/credentials.php',
+    '.aws/config.php',
+    '.aws/config.php',
+    'credentials/.env',
+    '.environments',
+    'root.php',
+    'credentials.php',
+    '.git/config',
+    '.git/head',
+    '_ignition/execute-solution/',
+    '_ignition/health-check/',
+    'modx/manager/',
+    'owa/auth/x.js',
+    'owa/auth/logon.aspx',
+    'jenkins/login/',
+    'manager/html/',
+    'bitrix/admin/',
+    'phpinfo.php',
+    'login.action',
+    'priv8.php',
+    'shell4.php',
+    'uploader.php',
+    'edit-form.php',
+    'util/login.aspx',
+    'mailer.php',
+    'fckeditor/editor/filemanager/connectors/test.html',
+    'atilektcms/',
+    'SiPbx/adminlogin.php',
+})

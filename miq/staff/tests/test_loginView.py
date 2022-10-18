@@ -50,7 +50,7 @@ class TestStaffLogin(Mixin, LiveServerTestCase):
             driver.implicitly_wait(3000)
 
             # driver.get('http://192.168.1.231:8000/staff/login/')
-            driver.get(f'{self.domain}{self.login_path}')
+            # driver.get(f'{self.domain}{self.login_path}')
             driver.save_screenshot('screenshot.png')
 
             # raise Exception(self.login_path)

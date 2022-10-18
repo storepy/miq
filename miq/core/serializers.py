@@ -77,17 +77,17 @@ def serialize_context_pagination(request, context):
     return data
 
 
-class PublicImageSerializer(serializers.ModelSerializer):
-    class Meta:
-        model = Image
-        read_only_fields = [
-            'src', 'src_mobile', 'thumb', 'thumb_sq',
-            'alt_text', 'caption',
-            'height', 'width', 'height_mobile', 'width_mobile',
-        ]
-        fields = [*read_only_fields]
+# class PublicImageSerializer(serializers.ModelSerializer):
+#     class Meta:
+#         model = Image
+#         read_only_fields = [
+#             'src', 'src_mobile', 'thumb', 'thumb_sq',
+#             'alt_text', 'caption',
+#             'height', 'width', 'height_mobile', 'width_mobile',
+#         ]
+#         fields = [*read_only_fields]
 
-    width = serializers.ReadOnlyField()
-    height = serializers.ReadOnlyField()
-    width_mobile = serializers.ReadOnlyField()
-    height_mobile = serializers.ReadOnlyField()
+#     width = serializers.ReadOnlyField()
+#     height = serializers.ReadOnlyField()
+#     width_mobile = serializers.ReadOnlyField()
+#     height_mobile = serializers.ReadOnlyField()
