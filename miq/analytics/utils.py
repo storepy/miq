@@ -18,7 +18,7 @@ logger = logging.getLogger(__name__)
 loginfo = logger.info
 logerr = logger.error
 
-exclude = ['/media/', '/favicon.ico', ]
+exclude = ['/media/', '/favicon.ico', '/beat/']
 
 # SESSION APP KEYS
 
@@ -34,10 +34,25 @@ bots = [
 
 
 def create_visitor(request, *, is_bot=False, ** kwargs):
+
+    def set_user(visitor):
+        if visitor and not visitor.user and request.user.is_authenticated:
+            visitor.user = request.user
+            visitor.save()
+
+    visitor = None
+    user = request.user if request.user.is_authenticated else None
+
+    _vis = request.COOKIES.get('_vis', None)
+    if _vis and (vis := Visitor.objects.filter(slug=_vis)).exists():
+        visitor = vis.order_by('created').first()
+        set_user(visitor)
+        return visitor
+
     ua = request.META.get('HTTP_USER_AGENT')
     filter = {'ip': get_ip(request), 'user_agent': ua}
+
     visitor = Visitor.objects.filter(**filter)
-    user = request.user if request.user.is_authenticated else None
     if not visitor.exists():
         visitor = Visitor.objects.create(
             **filter, user=user,
@@ -46,10 +61,8 @@ def create_visitor(request, *, is_bot=False, ** kwargs):
         loginfo(f'created visitor: {visitor}')
         return visitor
 
-    visitor = visitor.order_by('-created').first()
-    if not visitor.user and request.user.is_authenticated:
-        visitor.user = user
-        visitor.save()
+    visitor = visitor.order_by('created').first()
+    set_user(visitor)
     return visitor
 
 
@@ -104,6 +117,7 @@ def parse_hit_data(url, referrer, user_agent, session_data):
 
     if isinstance(user_agent, str) and (ua_data := parse_ua(user_agent)):
         parsed.update(ua_data)
+
     return parsed
 
 

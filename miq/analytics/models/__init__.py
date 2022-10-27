@@ -32,12 +32,6 @@ class LIB(BaseModelMixin):
 
     objects = LIBManager()
 
-    # def hits(self):
-    #     key = f'p/{self.name}'
-    #     return Hit.objects.filter(
-    #         models.Q(path__icontains=key) | models.Q(referrer__icontains=key)
-    #     ).distinct()
-
     class Meta:
         verbose_name = _('Link in bio')
         verbose_name_plural = _('Links in bio')
@@ -49,6 +43,20 @@ class LIB(BaseModelMixin):
 #
 # ========================== HITS ==========================
 #
+
+
+# class Device(BaseModelMixin):
+#     name = models.CharField(_("Name"), max_length=99, null=True, blank=True)
+#     user_agent = models.TextField(unique=True, db_index=True)
+#     is_mobile = models.BooleanField(_("Is mobile"), default=False)
+
+#     class Meta:
+#         verbose_name = _('Device')
+#         verbose_name_plural = _('Devices')
+#         ordering = ('-updated', '-created')
+
+#     def __str__(self) -> str:
+#         return f'{self.user_agent}'
 
 
 class AbstractVisitor(BaseModelMixin):
@@ -69,6 +77,26 @@ class Visitor(AbstractVisitor):
         related_name='visitors', blank=True, null=True)
 
     is_bot = models.BooleanField(_('Is bot'), default=False)
+
+    is_parsed = models.BooleanField(_("Is parsed"), default=False)
+
+    city = models.CharField(_("City"), max_length=99, blank=True, null=True)
+    country = models.CharField(_("Country"), max_length=99, blank=True, null=True)
+    countryCode = models.CharField(_("Country Code"), max_length=99, blank=True, null=True)
+    region = models.CharField(_("Region"), max_length=99, blank=True, null=True)
+    regionName = models.CharField(_("Region Name"), max_length=99, blank=True, null=True)
+    zip = models.FloatField(_("Zip"), blank=True, null=True)
+
+    currency = models.CharField(_("Currency"), max_length=99, blank=True, null=True)
+    timezone = models.CharField(_("Timezone"), max_length=99, blank=True, null=True)
+
+    mobile = models.BooleanField(_("Is parsed"), default=False)
+    proxy = models.BooleanField(_("Is parsed"), default=False)
+
+    asfullname = models.CharField(_("As"), max_length=99, blank=True, null=True)
+    asname = models.CharField(_("As Name"), max_length=99, blank=True, null=True)
+    org = models.CharField(_("Org"), max_length=99, blank=True, null=True)
+    isp = models.CharField(_("ISP"), max_length=99, blank=True, null=True)
 
     class Meta:
         verbose_name = _('Visitor')

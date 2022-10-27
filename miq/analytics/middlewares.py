@@ -18,13 +18,21 @@ class AnalyticsMiddleware(CurrentSiteMiddleware):
 
     def __call__(self, request):
 
+        cookies = request.COOKIES
+        _vis = cookies.get('_vis')
+
         request.is_threat = is_threat(request)
-        request.visitor = SimpleLazyObject(lambda: get_visitor(request))
+
+        visitor = SimpleLazyObject(lambda: get_visitor(request))
+        request.visitor = visitor
 
         response = self.get_response(request)
 
         if '/media/' in request.path:
             return response
+
+        if not _vis:
+            response.set_cookie('_vis', f'{visitor.slug}')
 
         try:
             create_hit(request, response)
