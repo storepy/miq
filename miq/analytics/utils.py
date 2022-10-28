@@ -18,7 +18,7 @@ logger = logging.getLogger(__name__)
 loginfo = logger.info
 logerr = logger.error
 
-exclude = ['/media/', '/favicon.ico', '/beat/']
+exclude = ['/media/', '/favicon.ico', '/beat/', '/jsi18n/', ]
 
 # SESSION APP KEYS
 
