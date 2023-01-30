@@ -26,23 +26,23 @@ class UserMixin:
 
         return self.create_user(username, password)
 
-    def add_user_perm(self, user, codename, refresh=True):
-        perm = self.get_user_perm(codename)
-        user.user_permissions.add(perm)
+    # def add_user_perm(self, user, codename, refresh=True):
+    #     perm = self.get_user_perm(codename)
+    #     user.user_permissions.add(perm)
 
-        # to invalidate the cache
-        if refresh:
-            return self.refresh_user(user.username)
-        return user
+    #     # to invalidate the cache
+    #     if refresh:
+    #         return self.refresh_user(user.username)
+    #     return user
 
-    def get_user_perm(self, codename):
-        return Permission.objects.get(codename=codename)
+    # def get_user_perm(self, codename):
+    #     return Permission.objects.get(codename=codename)
 
-    def create_user(self, username, password):
-        user = User.objects.create_user(username=username)
-        user.set_password(password)
-        user.save()
-        return user
+    # def create_user(self, username, password):
+    #     user = User.objects.create_user(username=username)
+    #     user.set_password(password)
+    #     user.save()
+    #     return user
 
     def create_staffuser(self, username, password):
         # return create_staffuser(username, password)
@@ -59,8 +59,8 @@ class UserMixin:
         user.save()
         return user
 
-    def refresh_user(self, username):
-        return User.objects.get(username=username)
+    # def refresh_user(self, username):
+    #     return User.objects.get(username=username)
 
 
 class SiteMixin:
@@ -68,16 +68,7 @@ class SiteMixin:
     def site(self):
         return Site.objects.first()
 
-    def set_live(self, *, is_live: bool = True):
-        from miq.core.models import SiteSetting
-        setting = SiteSetting.objects.get(site=self.site)  # type: SiteSetting
-        setting.is_live = is_live
-        setting.save()
-
-        return setting
-
-    def create_site(self):
-        return Site.objects.create()
+    
 
 
 class TestMixin(SiteMixin, UserMixin):
