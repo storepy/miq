@@ -5,12 +5,12 @@ from django.test import TransactionTestCase
 
 from miq.core.models import Image
 from miq.core.services import user_create
-from miq.tests.utils import get_temp_img, get_random_user_data, get_or_create_site
+from miq.tests import get_temp_img, get_random_user_data, get_or_create_site, TestMixin
 
 TEST_MEDIA_DIR = 'test_media'
 
 
-class Mixin:
+class Mixin(TestMixin):
 
     def tearDown(self):
         try:

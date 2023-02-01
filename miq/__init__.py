@@ -1,6 +1,6 @@
 
-import sys
-sys.path.append('./miq')
+# import sys
+# sys.path.append('./miq')
 
 __author__ = "marqetintl"
 __co_author__ = "Michaël Gainyo"

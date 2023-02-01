@@ -1,5 +1,4 @@
-
-from .test_indexModel import TestCoreIndexModel
-from .test_indexView import TestCoreIndexView
-from .test_m_image import TestCoreImageModel
-from .test_pageView import TestCorePageView
+from .test_middleware import *  # noqa
+from .test_user_services import *  # noqa
+from .test_utils import *  # noqa
+from .test_m_image import *  # noqa

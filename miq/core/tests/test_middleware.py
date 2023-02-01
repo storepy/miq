@@ -1,10 +1,10 @@
 from django.test import TestCase, LiveServerTestCase
 
 
-from miq.tests.utils import get_or_create_site
+from miq.tests import get_or_create_site, TestMixin
 
 
-class TestCoreMiddleware(LiveServerTestCase):
+class TestCoreMiddleware(TestMixin, LiveServerTestCase):
     def setUp(self) -> None:
         super().setUp()
         self.site = get_or_create_site(is_live=True)
@@ -13,8 +13,9 @@ class TestCoreMiddleware(LiveServerTestCase):
     def test_context_is_live(self):
         self.assertTrue(self.site.settings.is_live)
 
-        r = self.client.get(self.live_server_url)
-        ctx = r.context
+        res = self.client.get(self.live_server_url)
+        self.assertHttp200(res)
+        ctx = res.context
 
         self.assertTrue(ctx['is_live'])
         self.assertTrue(ctx['display_live'])
