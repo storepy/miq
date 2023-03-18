@@ -1,8 +1,11 @@
 {
+  "prettier.configPath": "/Users/marqetintl/Dropbox/MIQ/projects/py/storepy/client/.prettierrc",
+  "prettier.requireConfig": true,
+  "prettier.semi": false,
+  "prettier.tabWidth": 2,
   "editor.formatOnPaste": true,
   "editor.formatOnSave": true,
   "editor.bracketPairColorization.enabled": true,
-  "python.formatting.provider": "autopep8",
   "python.testing.unittestArgs": ["-v", "-s", ".", "-p", "test*.py"],
   "python.testing.pytestEnabled": true,
   "python.testing.unittestEnabled": false,
@@ -10,14 +13,5 @@
   "python.linting.flake8Enabled": true,
   "python.linting.pylintEnabled": false,
   "python.linting.enabled": true,
-  "files.exclude": {
-    "**/.git": true,
-    "**/.svn": true,
-    "**/.hg": true,
-    "**/CVS": true,
-    "**/.DS_Store": true,
-    ".vscode": true,
-    "**/*.pyc": true
-  },
   "python.defaultInterpreterPath": "/Users/marqetintl/Dropbox/MIQ/projects/py/storepy/stenv/bin/python3"
 }

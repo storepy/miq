@@ -13,7 +13,7 @@ app_name = 'staff'
 staff_router = routers.DefaultRouter()
 
 staff_router.register(r'account', viewsets.UserUpdateViewset)
-staff_router.register(r'search-staff', viewsets.SearchView)
+staff_router.register(r'search-staff', viewsets.SearchView,'user-search')
 
 staff_router.register(r'pages', viewsets.PageViewset)
 staff_router.register(r'index', viewsets.IndexViewset)

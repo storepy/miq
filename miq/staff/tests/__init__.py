@@ -1,1 +1,1 @@
-from .test_loginView import TestStaffLogin, LoginPage
+from .test_user_services import *  # noqa
