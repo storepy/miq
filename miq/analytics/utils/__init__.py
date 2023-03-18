@@ -8,9 +8,11 @@ from user_agents import parse as _parse_
 from django.conf import settings
 from django.utils import timezone
 
-from ..core.utils import get_ip
+from ...core.utils import get_ip
 
-from .models import Hit, Visitor
+from ..models import Hit, Visitor
+
+from .request import get_request_url
 
 # #  whatsapp
 
@@ -58,7 +60,7 @@ def create_visitor(request, *, is_bot=False, ** kwargs):
             **filter, user=user,
             is_bot=is_bot or get_hit_is_bot(ua, path=request.path)
         )
-        loginfo(f'created visitor: {visitor}')
+        loginfo(f'[{visitor.pk}]: Visitor created')
         return visitor
 
     visitor = visitor.order_by('created').first()
@@ -129,7 +131,7 @@ def parse_hit(hit):
         hit.is_bot = get_hit_is_bot(hit.user_agent, path=hit.path)
 
     hit.save()
-    loginfo(f'parsed hit: {hit}')
+    loginfo(f'[{hit.pk}]: Hit parsed')
 
 
 def parse_hits():
@@ -137,7 +139,7 @@ def parse_hits():
     for hit in hits:
         parse_hit(hit)
 
-    loginfo(f'parsed {hits.count()} hits')
+    loginfo(f'{hits.count()} hits parsed')
 
 
 def create_hit(request, response, /, source: str = None, ** kwargs) -> Hit:
@@ -188,7 +190,7 @@ def create_hit(request, response, /, source: str = None, ** kwargs) -> Hit:
     last = Hit.objects.filter(
         ip=data.get('ip'), session=data.get('session'), url=url, path=data.get('path'),
         method=data.get('method'), site_id=data.get('site_id'), response_status=data.get('status'),
-        created__gt=timezone.now() - datetime.timedelta(minutes=1),
+        created__gt=timezone.now() - datetime.timedelta(hours=24),
     )
 
     visitor = request.visitor
@@ -199,7 +201,7 @@ def create_hit(request, response, /, source: str = None, ** kwargs) -> Hit:
             hit.visitor = visitor
 
         hit.save()
-        loginfo(f'updated hit: {hit.slug}')
+        loginfo(f'[{hit.slug}]: Hit updated')
     else:
         hit = Hit.objects.create(**{
             **data,
@@ -208,7 +210,7 @@ def create_hit(request, response, /, source: str = None, ** kwargs) -> Hit:
             'is_parsed': True,
             'is_bot': visitor.is_bot,
         })
-        loginfo(f'new hit: {hit.slug}')
+        loginfo(f'[{hit.id}]: Hit created')
 
     return hit
 
@@ -249,14 +251,6 @@ def get_hit_data(request, response, /, source: str = None) -> dict:
         'response_status': response.status_code,
         'session_data': {},
     }
-
-
-def get_request_url(request):
-    return request.build_absolute_uri() \
-        or request.get_full_path_info() \
-        or request.get_full_path() \
-        or request.path_info \
-        or request.path
 
 
 def skip_hit(request):

@@ -1,7 +1,9 @@
+
 from django.utils.functional import SimpleLazyObject
 from django.contrib.sites.middleware import CurrentSiteMiddleware
 
-from .utils import create_hit, create_visitor
+from .utils import create_hit, create_visitor, get_hit_data
+from .utils.fb import get_fb_params
 
 from ..honeypot.utils import is_threat
 
@@ -39,4 +41,18 @@ class AnalyticsMiddleware(CurrentSiteMiddleware):
         except Exception as e:
             print('\n\nError creating hit', e, '\n\n')
 
+        # print_request(request, response)
+
         return response
+
+
+def print_request(request, response):
+    print('\n\n=>fbparams', get_fb_params(request, response=response))
+
+    data = get_hit_data(request, response)
+    print('=>url', data.get('url'))
+    print('=>ip', data.get('ip'))
+    print('=>session', data.get('session'))
+    print('=>referrer', data.get('referrer'))
+    print('=>user_agent', data.get('user_agent'))
+    print()

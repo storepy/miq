@@ -14,7 +14,9 @@ local = threading.local()
 def set_current(request):
     setattr(local, 'site', get_current_site(request))
     setattr(local, 'request', request)
-    setattr(local, 'user', request.user)
+
+    if hasattr(request, 'user'):
+        setattr(local, 'user', request.user)
 
 
 class SiteMiddleware(CurrentSiteMiddleware):
@@ -58,7 +60,7 @@ class SiteMiddleware(CurrentSiteMiddleware):
         if not site:
             return response
 
-        ctx['is_live'] = False
+        is_live = False
 
         # SITE
         site = Site.objects.filter(id=site.id).first()
@@ -74,7 +76,7 @@ class SiteMiddleware(CurrentSiteMiddleware):
 
         settings = SiteSetting.objects.filter(site=site).first()
         if settings:
-            ctx['is_live'] = settings.is_live
+            is_live = settings.is_live
             ctx['close_template'] = {
                 'html': settings.ct_html,
                 'title': settings.ct_title,
@@ -115,18 +117,21 @@ class SiteMiddleware(CurrentSiteMiddleware):
                 sD['fb_app_id'] = fb.strip()
 
             if fb := settings.fb_app_secret:
-                ctx['fb_app_secret'] = fb.strip()
-                sD['fb_app_secret'] = fb.strip()
+                pass
+                # ctx['fb_app_secret'] = fb.strip()
+                # sD['fb_app_secret'] = fb.strip()
 
-        display_live = ctx.get('is_live', False) is True or request.path == '/login/'
+        # TODO: Rename display_live to show_content
+        display_live = is_live is True or request.path == '/login/'
 
         view_mode = 'user'
         if request.user.is_authenticated and request.user.is_staff:
             display_live = True
 
-        if display_live and not ctx.get('is_live', False):
+        if display_live and not is_live:
             view_mode = 'admin'
 
+        ctx['is_live'] = is_live
         ctx['display_live'] = display_live
         ctx['view_mode'] = view_mode
         sD['view_mode'] = view_mode
@@ -147,10 +152,6 @@ class CORSMiddleware(object):
     def __call__(self, request):
         response = self.get_response(request)
         self.process_response(response)
-
-        # from pprint import pprint
-        # print(request.headers.__dict__)
-
         return response
 
     def process_response(self, response):

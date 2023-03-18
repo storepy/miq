@@ -1,3 +1,4 @@
+
 from django.apps import apps
 from rest_framework import serializers
 
@@ -57,29 +58,3 @@ class LIBSerializer(serializers.ModelSerializer):
         )
 
     utm_campaign = serializers.CharField(source='name', read_only=True)
-
-    # hits = LIBHitSerializer(many=True, read_only=True)
-
-
-# class CampaignSummarySerializer(serializers.ModelSerializer):
-#     class Meta:
-#         model = Campaign
-#         queryset = Campaign.objects.all()
-#         read_only_fields = ('key', 'value', 'count',)
-#         fields = read_only_fields
-
-#     count = serializers.IntegerField()
-
-
-# class CampaignSerializer(CampaignSummarySerializer):
-#     class Meta(CampaignSummarySerializer.Meta):
-#         read_only_fields = ('slug', 'key', 'value', 'ip', 'created', 'updated')
-#         fields = read_only_fields
-
-
-# class SearchTermSerializer(serializers.ModelSerializer):
-#     class Meta:
-#         model = SearchTerm
-#         queryset = SearchTerm.objects.all()
-#         read_only_fields = ('slug', 'session', 'value', 'count', 'created', 'updated')
-#         fields = read_only_fields

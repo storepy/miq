@@ -128,13 +128,12 @@ class Image(RendererMixin, BaseModelMixin):
 
     def save(self, *args, **kwargs):
 
-        if not hasattr(self, 'site') and local and local.site:
+        if not hasattr(self, 'site') and local and hasattr(local,'site'):
             self.site = local.site
 
-        if not hasattr(self, 'user') and local and local.user:
-            user = local.user
-            if user.is_authenticated:
-                self.user = user
+        if not hasattr(self, 'user') and local and hasattr(local,'user'):
+            if local.user.is_authenticated:
+                self.user = local.user
 
         if not self.pk:
             filename = self.src.url.split('/')[-1]  # type: str

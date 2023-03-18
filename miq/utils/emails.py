@@ -36,8 +36,9 @@ def send_email(subject: str, message: str, from_email, recipient_list, html_mess
     )
 
 
-def send_email_template(subject, template, context, from_email, recipient_list, fail_silently=False,
-                        auth_user=None, auth_password=None, connection=None, html_message=None):
+def send_email_template(
+        subject, template, context, from_email, recipient_list, fail_silently=False,
+        auth_user=None, auth_password=None, connection=None, html_message=None):
     """
     Sends an email to the recipient_list.
     """
